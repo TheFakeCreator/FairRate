@@ -12,12 +12,43 @@ FairRate completely syncs with your native IMDb account in the background—so y
 
 ## Screenshots
 
+<div align="center">
+
 ![Movie Page](/public/images/heropage.png)
+<br>
+*The FairRate UI seamlessly injected directly into IMDb's native movie pages.*
+
+<br><br>
+
 ![Rating Modal](/public/images/ratingmodal.png)
+<br>
+*The beautiful, context-aware rating modal with our 5 distinct cinematic categories.*
+
+<br><br>
+
 ![Export Card](/public/images/exportcard.png)
+<br>
+*Stunning, high-resolution rating cards generated dynamically for you to share online.*
+
+<br><br>
+
 ![Popup Menu](/public/images/popup.png)
+<br>
+*Quick-access popup menu with IMDb-matching aesthetics for importing/exporting your data.*
+
+<br><br>
+
 ![Dashboard](/public/images/dashboard.png)
+<br>
+*Your personal local dashboard to search, view, and manage your entire rating history.*
+
+<br><br>
+
 ![Custom Presets](/public/images/custompresets.png)
+<br>
+*Create custom genre presets to assign custom weight multipliers based on your preferences.*
+
+</div>
 
 ## ✨ Features
 
