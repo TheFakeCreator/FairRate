@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "FairRate",
+  "version": "1.0.0",
+  "description": "Context-Aware Movie Rating for IMDb",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.js",
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.imdb.com/*"],
+      "js": ["src/content/index.jsx"]
+    }
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["*://*.imdb.com/*"]
+    }
+  ]
+}
