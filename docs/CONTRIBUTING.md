@@ -10,7 +10,7 @@ Thank you for your interest in improving FairRate! Whether you are fixing bugs, 
 
 2. **Clone & Install**
    ```bash
-   git clone https://github.com/yourusername/fairrate-extension.git
+   git clone https://github.com/TheFakeCreator/FairRate
    cd fairrate-extension
    npm install
    ```

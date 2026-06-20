@@ -10,6 +10,15 @@ Tired of giving a movie a flat "7/10" and forgetting why? **FairRate** replaces 
 
 FairRate completely syncs with your native IMDb account in the background—so you still get the official IMDb rating credit, but with a much richer personal database!
 
+## Screenshots
+
+![Movie Page](/public/images/heropage.png)
+![Rating Modal](/public/images/ratingmodal.png)
+![Export Card](/public/images/exportcard.png)
+![Popup Menu](/public/images/popup.png)
+![Dashboard](/public/images/dashboard.png)
+![Custom Presets](/public/images/custompresets.png)
+
 ## ✨ Features
 
 - **🎬 5-Aspect Rating System:** Rate movies based on *Enjoyment*, *Story*, *Characters*, *Technical Execution*, and *Emotional Impact*.
@@ -22,7 +31,7 @@ FairRate completely syncs with your native IMDb account in the background—so y
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/fairrate-extension.git
+   git clone https://github.com/TheFakeCreator/FairRate
    ```
 2. Navigate into the directory and install dependencies:
    ```bash
