@@ -2,6 +2,12 @@
   <img src="public/icons/icon128.png" width="100" alt="FairRate Logo" />
   <h1>FairRate - Context-Aware IMDb Ratings</h1>
   <p>A powerful Chrome extension that completely transforms how you rate movies on IMDb by breaking down ratings into 5 distinct cinematic aspects.</p>
+  
+  <br />
+  <a href="https://TheFakeCreator.github.io/FairRate/">
+    <img src="https://img.shields.io/badge/Official%20Website-Visit%20Now-F5C518?style=for-the-badge&logo=googlechrome&logoColor=black" alt="Official Website" />
+  </a>
+  <br /><br />
 </div>
 
 ## 🌟 Overview
@@ -57,6 +63,10 @@ FairRate completely syncs with your native IMDb account in the background—so y
 - **📸 Beautiful Exportable Cards:** Share your in-depth ratings on Twitter, Reddit, or Letterboxd with stunning, auto-generated rating cards featuring the official movie poster.
 - **🔄 Auto-Syncs with IMDb:** No double-work. Whatever your final weighted score is, FairRate automatically pushes that rating directly into IMDb's native system.
 - **📊 Local Dashboard:** View, search, and manage your entire rating history right inside the extension. Includes JSON import/export to keep your data safe.
+
+## 🌐 Official Website & Download
+
+Don't want to build from source? Visit our **[Official Website](https://TheFakeCreator.github.io/FairRate/)** to download the latest compiled `.zip` release and view easy manual installation instructions.
 
 ## 🚀 Installation (Developer Mode)
 
