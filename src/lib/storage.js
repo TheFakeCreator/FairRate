@@ -246,14 +246,20 @@ export async function pullFromCloud() {
     
     // Merge down to local storage
     if (data.presets && data.presets.length > 0) {
+      // If cloud has presets, we will use them to override local
       await settingsStore.setItem('presets', data.presets);
     }
     
     if (data.ratings && data.ratings.length > 0) {
-      await ratingsStore.clear();
+      // Do a proper merge based on updatedAt to prevent data loss
       for (const r of data.ratings) {
         const { movieId, ...rest } = r;
-        await ratingsStore.setItem(movieId, rest);
+        const local = await ratingsStore.getItem(movieId);
+        
+        // If local doesn't have it, or cloud is newer, overwrite local
+        if (!local || new Date(rest.updatedAt) > new Date(local.updatedAt)) {
+          await ratingsStore.setItem(movieId, rest);
+        }
       }
     }
     
