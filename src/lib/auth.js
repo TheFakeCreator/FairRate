@@ -5,10 +5,33 @@ const API_URL = import.meta.env.PROD
 
 export const signInWithGoogle = async () => {
   return new Promise((resolve, reject) => {
-    chrome.identity.getAuthToken({ interactive: true }, async (token) => {
-      if (chrome.runtime.lastError || !token) {
+    const manifest = chrome.runtime.getManifest();
+    const clientId = manifest.oauth2.client_id;
+    const redirectUri = chrome.identity.getRedirectURL();
+    const scopes = manifest.oauth2.scopes.join(' ');
+    
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('response_type', 'token');
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('scope', scopes);
+    authUrl.searchParams.set('prompt', 'select_account');
+
+    chrome.identity.launchWebAuthFlow({
+      url: authUrl.href,
+      interactive: true
+    }, async (responseUrl) => {
+      if (chrome.runtime.lastError || !responseUrl) {
         console.error(chrome.runtime.lastError);
-        return reject(chrome.runtime.lastError);
+        return reject(chrome.runtime.lastError || new Error('Auth cancelled'));
+      }
+
+      // The token is in the URL hash, e.g., #access_token=...&token_type=Bearer&expires_in=...
+      const hashParams = new URLSearchParams(new URL(responseUrl).hash.substring(1));
+      const token = hashParams.get('access_token');
+
+      if (!token) {
+        return reject(new Error('Access token missing from redirect'));
       }
 
       try {
@@ -39,19 +62,9 @@ export const signInWithGoogle = async () => {
 };
 
 export const signOut = async () => {
-  return new Promise((resolve) => {
-    chrome.identity.getAuthToken({ interactive: false }, (token) => {
-      if (token) {
-        // Revoke token from Google
-        fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`);
-        chrome.identity.removeCachedAuthToken({ token }, async () => {
-          await chrome.storage.local.remove(['authToken', 'user']);
-          resolve();
-        });
-      } else {
-        chrome.storage.local.remove(['authToken', 'user']).then(resolve);
-      }
-    });
+  return new Promise(async (resolve) => {
+    await chrome.storage.local.remove(['authToken', 'user']);
+    resolve();
   });
 };
 
