@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   picture: { type: String },
   presets: [presetSchema],
   ratings: [ratingSchema],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   lastSyncedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 

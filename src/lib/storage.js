@@ -263,3 +263,73 @@ export async function pullFromCloud() {
     return false;
   }
 }
+
+// --- SOCIAL / FRIENDS LOGIC ---
+
+export async function searchUser(email) {
+  const result = await chrome.storage.local.get(['authToken']);
+  if (!result.authToken) return null;
+  
+  try {
+    const response = await fetch(`${API_URL}/friends?action=search&email=${encodeURIComponent(email)}`, {
+      headers: { 'Authorization': `Bearer ${result.authToken}` }
+    });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch(e) {
+    return null;
+  }
+}
+
+export async function getFollowing() {
+  const result = await chrome.storage.local.get(['authToken']);
+  if (!result.authToken) return [];
+  
+  try {
+    const response = await fetch(`${API_URL}/friends?action=list`, {
+      headers: { 'Authorization': `Bearer ${result.authToken}` }
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.following || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+export async function toggleFollow(targetUserId) {
+  const result = await chrome.storage.local.get(['authToken']);
+  if (!result.authToken) return false;
+  
+  try {
+    const response = await fetch(`${API_URL}/friends`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${result.authToken}` 
+      },
+      body: JSON.stringify({ action: 'follow', targetUserId })
+    });
+    if (!response.ok) return false;
+    const data = await response.json();
+    return data;
+  } catch(e) {
+    return false;
+  }
+}
+
+export async function getFriendsRatings(movieId) {
+  const result = await chrome.storage.local.get(['authToken']);
+  if (!result.authToken) return [];
+  
+  try {
+    const response = await fetch(`${API_URL}/friends?action=ratings&movieId=${movieId}`, {
+      headers: { 'Authorization': `Bearer ${result.authToken}` }
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.ratings || [];
+  } catch(e) {
+    return [];
+  }
+}

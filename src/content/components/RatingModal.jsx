@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, Star, Save, Check, Download, Share2, LayoutPanelLeft, LayoutPanelTop, ChevronLeft } from 'lucide-react'
-import { saveRating, getRating, getPresets } from '../../lib/storage'
+import { saveRating, getRating, getPresets, getFriendsRatings } from '../../lib/storage'
 import { cn } from '../../lib/utils'
 import { toPng } from 'html-to-image'
 
@@ -51,6 +51,7 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
   const [selectedPresetId, setSelectedPresetId] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [friendsRatings, setFriendsRatings] = useState([])
   
   const [shareMode, setShareMode] = useState(false)
   const [shareLayout, setShareLayout] = useState('horizontal')
@@ -73,6 +74,9 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
           setSelectedPresetId(data.presetId)
         }
       }
+
+      const friendsData = await getFriendsRatings(movieId)
+      setFriendsRatings(friendsData)
     }
     if (movieId) loadData()
   }, [movieId])
@@ -365,6 +369,33 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
               </div>
             ))}
           </div>
+
+          {friendsRatings.length > 0 && (
+            <div className="pt-6 border-t border-imdb-border space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400">Friends' Ratings</h3>
+              <div className="space-y-3">
+                {friendsRatings.map((fr, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-imdb-darker p-3 rounded-md border border-imdb-border/50">
+                    <div className="flex items-center gap-3">
+                      {fr.user.picture ? (
+                        <img src={fr.user.picture} className="w-8 h-8 rounded-full border border-imdb-border" alt="Profile" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-imdb-border flex items-center justify-center text-white text-xs font-bold">{fr.user.name[0]}</div>
+                      )}
+                      <div>
+                        <div className="text-sm font-bold text-white leading-tight">{fr.user.name}</div>
+                        <div className="text-[10px] text-gray-400">Rated {new Date(fr.rating.updatedAt).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 font-mono font-bold text-imdb-yellow">
+                      <span className="text-xl">{Number(fr.rating.overall)}</span>
+                      <Star className="w-4 h-4 fill-imdb-yellow text-imdb-yellow -mt-0.5" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
           {/* Footer */}

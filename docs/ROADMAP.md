@@ -4,15 +4,6 @@ This document outlines the planned features and major updates for upcoming relea
 
 ---
 
-## ☁️ Phase 5: Cloud Sync (Next Major Goal)
-
-Currently, all ratings and presets are stored locally in the browser's IndexedDB. The next major architectural shift is implementing optional Cloud Sync.
-
-* **User Accounts:** Allow users to optionally sign up/log in to back up their data securely to the cloud.
-* **Cross-Device Synchronization:** Seamlessly sync rating history and custom genre presets across multiple computers and browsers.
-* **Data Portability:** Ensure users can still easily export their data even if they are using Cloud Sync.
-
----
 
 ## 🚀 Upcoming Features
 
