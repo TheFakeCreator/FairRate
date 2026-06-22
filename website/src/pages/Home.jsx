@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Star, Sliders, Share2, Layers, Cloud } from 'lucide-react';
+import { Download, Star, Sliders, Share2, Layers, Cloud, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function Home() {
@@ -16,7 +16,7 @@ function Home() {
       <main className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-24 flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-imdb-yellow/10 border border-imdb-yellow/20 text-imdb-yellow text-sm font-bold tracking-wide uppercase mb-8">
           <Star className="w-4 h-4 fill-imdb-yellow" />
-          v1.2.0 is out now!
+          v1.3.0 is out now!
         </div>
         
         <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight leading-tight mb-8 max-w-4xl">
@@ -29,7 +29,7 @@ function Home() {
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <a 
-            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.2.0.zip"
+            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.3.0.zip"
             onClick={handleDownload}
             className="flex items-center justify-center gap-3 bg-imdb-yellow text-black px-8 py-4 rounded-xl font-bold text-lg tracking-wider hover:bg-[#d8ad15] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(245,197,24,0.3)] w-full sm:w-auto"
           >
@@ -56,6 +56,7 @@ function Home() {
               <Feature icon={<Layers />} title="5-Aspect Rating" desc="Rate based on Enjoyment, Story, Characters, Technical Execution, and Emotional Impact." />
               <Feature icon={<Sliders />} title="Custom Presets" desc="Are you an action junkie? Set up genre presets that weigh 'Enjoyment' 2x higher than 'Story'." />
               <Feature icon={<Cloud />} title="Cloud Sync Backup" desc="Sign in with Google to automatically backup and sync your ratings and presets across devices." />
+              <Feature icon={<Users className="w-6 h-6" />} title="Follow Friends" desc="Follow your friends and instantly see what they rated the movie right inside the IMDb page!" />
               <Feature icon={<Share2 />} title="Export & Share" desc="Generate absolutely stunning glassmorphism rating cards to share on Twitter and Letterboxd." />
             </div>
           </div>
@@ -139,12 +140,12 @@ function Home() {
           <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 md:mb-8">Ready to rate?</h2>
           <p className="text-lg md:text-2xl text-gray-400 mb-10 md:mb-12">Stop giving arbitrary numbers. Start rating with context.</p>
           <a 
-            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.2.0.zip"
+            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.3.0.zip"
             onClick={handleDownload}
             className="flex items-center justify-center gap-3 bg-imdb-yellow text-black px-8 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-lg sm:text-xl tracking-wider hover:bg-[#d8ad15] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(245,197,24,0.4)] w-full sm:w-auto"
           >
             <Download className="w-6 h-6 shrink-0" />
-            Download FairRate v1.2.0
+            Download FairRate v1.3.0
           </a>
         </div>
       </section>

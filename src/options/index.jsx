@@ -15,6 +15,7 @@ function OptionsPage() {
   const [friendSearchEmail, setFriendSearchEmail] = useState('')
   const [friendSearchResult, setFriendSearchResult] = useState(null)
   const [searchError, setSearchError] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     async function loadData() {
