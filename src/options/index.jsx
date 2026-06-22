@@ -39,8 +39,18 @@ function OptionsPage() {
     try {
       const userData = await signInWithGoogle()
       setUser(userData)
-      // Automatically push existing local data to their newly created cloud account!
+      // First, smartly merge any existing cloud data down to local
+      await pullFromCloud()
+      // Then, push the merged local data back to the cloud
       await pushToCloud()
+      
+      // Update the UI with the merged data
+      const [rData, pData] = await Promise.all([
+        getAllRatings(),
+        getPresets()
+      ])
+      setRatings(rData)
+      setPresets(pData)
     } catch (error) {
       alert('Sign in failed. Check console for details.')
     }
