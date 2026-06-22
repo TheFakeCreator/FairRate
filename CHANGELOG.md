@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Social Integration: View your friends' ratings natively inside the IMDb modal.
 - Added a "Friends" management dashboard to the Options page.
 
+### Fixed
+- Fixed a critical cloud sync issue where signing into a new device with an empty local database would overwrite and erase cloud ratings. Sync now intelligently merges local and cloud ratings based on timestamps.
+
 ## [1.2.0] - 2026-06-22
 
 ### Added
