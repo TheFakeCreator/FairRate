@@ -13,8 +13,6 @@
   <br /><br />
   
   **🎯 Current Goal: $5** to pay the developer fee and officially publish FairRate to the Chrome Web Store!
-  
-  ![0% Funded](https://geps.dev/progress/0)
 </div>
 
 ## 🌟 Overview
