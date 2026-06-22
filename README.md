@@ -7,7 +7,12 @@
   <a href="https://TheFakeCreator.github.io/FairRate/">
     <img src="https://img.shields.io/badge/Official%20Website-Visit%20Now-F5C518?style=for-the-badge&logo=googlechrome&logoColor=black" alt="Official Website" />
   </a>
+  <a href="https://github.com/sponsors/TheFakeCreator">
+    <img src="https://img.shields.io/badge/Sponsor-Support%20Us-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor on GitHub" />
+  </a>
   <br /><br />
+  
+  **🎯 Current Goal: $5** to pay the developer fee and officially publish FairRate to the Chrome Web Store!
 </div>
 
 ## 🌟 Overview
