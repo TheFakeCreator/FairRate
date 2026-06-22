@@ -4,13 +4,13 @@ import { saveRating, getRating, getPresets } from '../../lib/storage'
 import { cn } from '../../lib/utils'
 import { toPng } from 'html-to-image'
 
-const ASPECTS = [
-  { id: 'enjoyment', label: 'Enjoyment & Pacing', desc: 'How much fun was it to watch?' },
-  { id: 'story', label: 'Story & Plot', desc: 'Writing, structure, and coherence.' },
-  { id: 'characters', label: 'Characters & Acting', desc: 'Performances and character arcs.' },
-  { id: 'technical', label: 'Technical Execution', desc: 'Cinematography, sound, VFX.' },
-  { id: 'emotional', label: 'Emotional Impact', desc: 'Did it make you feel something?' },
-]
+const DEFAULT_ASPECTS_META = {
+  enjoyment: { label: 'Enjoyment & Pacing', desc: 'How much fun was it to watch?' },
+  story: { label: 'Story & Plot', desc: 'Writing, structure, and coherence.' },
+  characters: { label: 'Characters & Acting', desc: 'Performances and character arcs.' },
+  technical: { label: 'Technical Execution', desc: 'Cinematography, sound, VFX.' },
+  emotional: { label: 'Emotional Impact', desc: 'Did it make you feel something?' },
+}
 
 function StarRating({ value, onChange }) {
   const [hoverValue, setHoverValue] = useState(0)
@@ -79,6 +79,34 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
 
   const activePreset = presets.find(p => p.id === selectedPresetId) || presets[0]
   const weights = activePreset ? activePreset.weights : { enjoyment: 1, story: 1, characters: 1, technical: 1, emotional: 1 }
+
+  // Build the dynamic aspects list based on the current preset's weights
+  const currentAspects = Object.keys(weights).map(id => {
+    if (DEFAULT_ASPECTS_META[id]) {
+      return { id, ...DEFAULT_ASPECTS_META[id] }
+    }
+    // For custom aspects, capitalize the ID for the label
+    return { 
+      id, 
+      label: id.charAt(0).toUpperCase() + id.slice(1), 
+      desc: 'Custom Aspect' 
+    }
+  })
+
+  // Ensure all aspects in the current preset have a default score if not already rated
+  useEffect(() => {
+    let needsUpdate = false
+    const newScores = { ...scores }
+    for (const aspectId of Object.keys(weights)) {
+      if (newScores[aspectId] === undefined) {
+        newScores[aspectId] = 5 // Default score
+        needsUpdate = true
+      }
+    }
+    if (needsUpdate) {
+      setScores(newScores)
+    }
+  }, [weights])
 
   const handleScoreChange = (aspectId, value) => {
     setScores(prev => ({ ...prev, [aspectId]: Number(value) }))
@@ -208,11 +236,11 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
               </div>
             </div>
             <div className="grid grid-cols-1 gap-3 shrink-0">
-              {ASPECTS.map(aspect => (
+              {currentAspects.map(aspect => (
                 <div key={aspect.id} className="flex items-center justify-between text-lg">
                   <span className="text-gray-400 capitalize">{aspect.label}</span>
                   <span className="text-white font-mono font-bold flex items-center gap-2">
-                    {scores[aspect.id]} <Star className="w-4 h-4 fill-imdb-yellow text-imdb-yellow" />
+                    {scores[aspect.id] || 5} <Star className="w-4 h-4 fill-imdb-yellow text-imdb-yellow" />
                   </span>
                 </div>
               ))}
@@ -247,11 +275,11 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
             </div>
           </div>
           <div className="w-full space-y-4 mb-8 z-10 shrink-0 mt-auto relative">
-            {ASPECTS.map(aspect => (
+            {currentAspects.map(aspect => (
               <div key={aspect.id} className="flex items-center justify-between text-lg bg-black/60 backdrop-blur-md px-5 py-2.5 rounded-lg border border-white/5">
                 <span className="text-gray-400 capitalize">{aspect.label}</span>
                 <span className="text-white font-mono font-bold flex items-center gap-2">
-                  {scores[aspect.id]} <Star className="w-4 h-4 fill-imdb-yellow text-imdb-yellow" />
+                  {scores[aspect.id] || 5} <Star className="w-4 h-4 fill-imdb-yellow text-imdb-yellow" />
                 </span>
               </div>
             ))}
@@ -312,7 +340,7 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
           </div>
 
           <div className="space-y-6">
-            {ASPECTS.map((aspect) => (
+            {currentAspects.map((aspect) => (
               <div key={aspect.id} className="space-y-3">
                 <div className="flex justify-between items-start text-sm">
                   <div className="pr-2">
@@ -326,12 +354,12 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
                       </span>
                     )}
                     <span className="text-imdb-yellow font-bold font-mono bg-imdb-darker border border-imdb-border px-2 py-0.5 rounded-sm">
-                      {scores[aspect.id]}
+                      {scores[aspect.id] || 5}
                     </span>
                   </div>
                 </div>
                 <StarRating 
-                  value={scores[aspect.id]} 
+                  value={scores[aspect.id] || 5} 
                   onChange={(val) => handleScoreChange(aspect.id, val)}
                 />
               </div>

@@ -35,7 +35,10 @@ function Privacy() {
         <section>
           <h2 className="text-2xl font-bold text-white mb-4">4. Third-Party Services</h2>
           <p>
-            FairRate interacts directly with IMDb to retrieve movie metadata (such as the poster image and title) and to submit your rating. Please refer to <a href="https://www.imdb.com/privacy" target="_blank" rel="noreferrer" className="text-imdb-yellow hover:underline">IMDb's Privacy Policy</a> for information on how they handle your data when using their website.
+            <strong>Extension:</strong> FairRate interacts directly with IMDb to retrieve movie metadata (such as the poster image and title) and to submit your rating. Please refer to <a href="https://www.imdb.com/privacy" target="_blank" rel="noreferrer" className="text-imdb-yellow hover:underline">IMDb's Privacy Policy</a> for information on how they handle your data when using their website.
+          </p>
+          <p className="mt-4">
+            <strong>Website:</strong> The official FairRate website uses Google Analytics to track anonymous, aggregated usage statistics (such as page views and download clicks). This data helps us understand how the website is being used and how we can improve it. No personally identifiable information is collected by our analytics.
           </p>
         </section>
 

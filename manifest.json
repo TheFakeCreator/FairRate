@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FairRate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Context-Aware Movie Rating for IMDb",
   "action": {
     "default_popup": "index.html"

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-22
+
+### Added
+- **Custom Rating Aspects**: Users can now fully customize the rating sliders within specific genre presets (e.g. adding "Cinematography", "Pacing").
+- Dynamic rating modal that seamlessly renders the custom aspects defined in the active preset.
+- Official website improvements, including Google Analytics integration and Ko-fi donation links.
+- Privacy Policy update to clarify website usage tracking while confirming the extension remains telemetry-free.
+
 ## [1.0.1] - 2026-06-21
 
 ### Added

@@ -58,7 +58,7 @@ FairRate completely syncs with your native IMDb account in the background—so y
 
 ## ✨ Features
 
-- **🎬 5-Aspect Rating System:** Rate movies based on *Enjoyment*, *Story*, *Characters*, *Technical Execution*, and *Emotional Impact*.
+- **🎬 Custom Rating Aspects:** Rate movies based on our 5 default aspects (*Enjoyment*, *Story*, *Characters*, *Technical*, *Emotional*) or create your own completely custom rating categories for different genres!
 - **⚖️ Custom Weighting:** Are you an action junkie? Create custom genre presets in your dashboard that assign higher multipliers to *Technical* or *Enjoyment* scores!
 - **📸 Beautiful Exportable Cards:** Share your in-depth ratings on Twitter, Reddit, or Letterboxd with stunning, auto-generated rating cards featuring the official movie poster.
 - **🔄 Auto-Syncs with IMDb:** No double-work. Whatever your final weighted score is, FairRate automatically pushes that rating directly into IMDb's native system.

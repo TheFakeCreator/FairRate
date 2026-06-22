@@ -58,6 +58,31 @@ function OptionsPage() {
     await savePresets(updated)
   }
 
+  const handleAddAspect = async (presetId, aspectName) => {
+    if (!aspectName.trim()) return;
+    const cleanName = aspectName.trim().toLowerCase();
+    const preset = presets.find(p => p.id === presetId);
+    if (!preset) return;
+    
+    // Default weight is 1
+    const newWeights = { ...preset.weights, [cleanName]: 1 };
+    await handleSavePreset(presetId, newWeights);
+  }
+
+  const handleRemoveAspect = async (presetId, aspectName) => {
+    const preset = presets.find(p => p.id === presetId);
+    if (!preset) return;
+    
+    const newWeights = { ...preset.weights };
+    delete newWeights[aspectName];
+    
+    if (Object.keys(newWeights).length === 0) {
+      alert("A preset must have at least one aspect.");
+      return;
+    }
+    await handleSavePreset(presetId, newWeights);
+  }
+
   const filteredRatings = ratings.filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
   return (
@@ -190,9 +215,18 @@ function OptionsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                     {Object.entries(preset.weights).map(([aspect, weight]) => (
-                      <div key={aspect} className="space-y-2">
+                      <div key={aspect} className="space-y-2 group">
                         <div className="flex justify-between items-center">
-                          <label className="capitalize font-medium text-gray-300">{aspect} Weight</label>
+                          <div className="flex items-center gap-2">
+                            <label className="capitalize font-medium text-gray-300">{aspect} Weight</label>
+                            <button 
+                              onClick={() => handleRemoveAspect(preset.id, aspect)}
+                              className="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1 rounded hover:bg-red-500/10"
+                              title="Remove Aspect"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                           <span className="font-mono text-imdb-yellow font-bold bg-imdb-darker px-2 py-1 rounded text-sm">
                             x{weight.toFixed(1)}
                           </span>
@@ -211,6 +245,32 @@ function OptionsPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Add Custom Aspect */}
+                  <div className="mt-8 pt-6 border-t border-imdb-border flex items-center gap-3">
+                    <input 
+                      type="text"
+                      id={`new-aspect-${preset.id}`}
+                      placeholder="New aspect (e.g. Cinematography)"
+                      className="bg-imdb-darker border border-imdb-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-imdb-yellow flex-1 max-w-[250px]"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddAspect(preset.id, e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                    />
+                    <button 
+                      onClick={() => {
+                        const el = document.getElementById(`new-aspect-${preset.id}`);
+                        handleAddAspect(preset.id, el.value);
+                        el.value = '';
+                      }}
+                      className="text-sm font-bold bg-imdb-border text-gray-300 px-4 py-2 rounded-md hover:bg-gray-700 hover:text-white transition-colors"
+                    >
+                      Add Custom Aspect
+                    </button>
                   </div>
                 </div>
               ))}
