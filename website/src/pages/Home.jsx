@@ -29,7 +29,7 @@ function Home() {
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <a 
-            href="https://github.com/TheFakeCreator/FairRate/releases/latest"
+            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.2.0.zip"
             onClick={handleDownload}
             className="flex items-center justify-center gap-3 bg-imdb-yellow text-black px-8 py-4 rounded-xl font-bold text-lg tracking-wider hover:bg-[#d8ad15] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(245,197,24,0.3)] w-full sm:w-auto"
           >
@@ -139,7 +139,7 @@ function Home() {
           <h2 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 md:mb-8">Ready to rate?</h2>
           <p className="text-lg md:text-2xl text-gray-400 mb-10 md:mb-12">Stop giving arbitrary numbers. Start rating with context.</p>
           <a 
-            href="https://github.com/TheFakeCreator/FairRate/releases/latest"
+            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.2.0.zip"
             onClick={handleDownload}
             className="flex items-center justify-center gap-3 bg-imdb-yellow text-black px-8 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-lg sm:text-xl tracking-wider hover:bg-[#d8ad15] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(245,197,24,0.4)] w-full sm:w-auto"
           >
