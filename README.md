@@ -60,6 +60,7 @@ FairRate completely syncs with your native IMDb account in the background—so y
 
 - **🎬 Custom Rating Aspects:** Rate movies based on our 5 default aspects (*Enjoyment*, *Story*, *Characters*, *Technical*, *Emotional*) or create your own completely custom rating categories for different genres!
 - **⚖️ Custom Weighting:** Are you an action junkie? Create custom genre presets in your dashboard that assign higher multipliers to *Technical* or *Enjoyment* scores!
+- **☁️ Cloud Sync:** Sign in with Google to automatically backup and sync your ratings and presets across devices!
 - **📸 Beautiful Exportable Cards:** Share your in-depth ratings on Twitter, Reddit, or Letterboxd with stunning, auto-generated rating cards featuring the official movie poster.
 - **🔄 Auto-Syncs with IMDb:** No double-work. Whatever your final weighted score is, FairRate automatically pushes that rating directly into IMDb's native system.
 - **📊 Local Dashboard:** View, search, and manage your entire rating history right inside the extension. Includes JSON import/export to keep your data safe.

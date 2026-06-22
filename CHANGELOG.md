@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-06-22
+
+### Added
+- **Cloud Sync**: Securely backup and sync all your ratings and presets across devices using Google Sign-In.
+- Fixed Extension ID for consistent local unpacking and OAuth verification.
+- Integrated a Serverless Backend via Vercel using MongoDB Atlas.
+
 ## [1.1.0] - 2026-06-22
 
 ### Added

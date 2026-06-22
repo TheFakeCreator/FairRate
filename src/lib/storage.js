@@ -4,6 +4,10 @@ import localforage from 'localforage'
 // Background worker has no window. Popup has chrome-extension: protocol. Content scripts have https: protocol.
 const isExtensionContext = typeof window === 'undefined' || window.location.protocol === 'chrome-extension:'
 
+const API_URL = import.meta.env.PROD 
+  ? 'https://fairrate-pi.vercel.app/api' 
+  : 'http://localhost:3000/api';
+
 let ratingsStore = null
 let settingsStore = null
 if (isExtensionContext) {
@@ -42,6 +46,10 @@ export async function saveRating(movieId, ratingData) {
       ...ratingData,
       updatedAt: new Date().toISOString()
     })
+    
+    // Auto-sync to cloud if logged in
+    pushToCloud().catch(console.error)
+    
     return true
   } catch (err) {
     console.error("Failed to save rating:", err)
@@ -185,6 +193,10 @@ export async function savePresets(presetsArray) {
   }
   try {
     await settingsStore.setItem('presets', presetsArray)
+    
+    // Auto-sync to cloud if logged in
+    pushToCloud().catch(console.error)
+    
     return true
   } catch (err) {
     console.error("Failed to save presets:", err)
@@ -192,3 +204,62 @@ export async function savePresets(presetsArray) {
   }
 }
 
+// --- CLOUD SYNC LOGIC ---
+
+export async function pushToCloud() {
+  if (!isExtensionContext) return false;
+  const result = await chrome.storage.local.get(['authToken']);
+  if (!result.authToken) return false;
+
+  try {
+    const ratings = await getAllRatings();
+    const presets = await getPresets();
+    
+    const response = await fetch(`${API_URL}/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${result.authToken}`
+      },
+      body: JSON.stringify({ presets, ratings })
+    });
+    return response.ok;
+  } catch(e) {
+    console.error("Cloud push failed", e);
+    return false;
+  }
+}
+
+export async function pullFromCloud() {
+  if (!isExtensionContext) return false;
+  const result = await chrome.storage.local.get(['authToken']);
+  if (!result.authToken) return false;
+  
+  try {
+    const response = await fetch(`${API_URL}/sync`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${result.authToken}` }
+    });
+    
+    if (!response.ok) return false;
+    const data = await response.json();
+    
+    // Merge down to local storage
+    if (data.presets && data.presets.length > 0) {
+      await settingsStore.setItem('presets', data.presets);
+    }
+    
+    if (data.ratings && data.ratings.length > 0) {
+      await ratingsStore.clear();
+      for (const r of data.ratings) {
+        const { movieId, ...rest } = r;
+        await ratingsStore.setItem(movieId, rest);
+      }
+    }
+    
+    return true;
+  } catch(e) {
+    console.error("Cloud pull failed", e);
+    return false;
+  }
+}

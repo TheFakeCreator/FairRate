@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
   "name": "FairRate",
-  "version": "1.1.0",
+  "version": "1.2.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr2FSC01ArUGFFW4lFet/226pUTNLYoi04Y7CduDeJce14RZlBfooG+Dr0jU20rHPz35qRK1/W/py3wZMUlf4R4AF1I5YW8JyJt4G88S1vchK4OlNxYC++/bB8whKQufU0l6SyjfJkETSddV6Q1mZyJB8WaLgFNHCeEEukZL9K2xO0cHCLgqkg5nap1Goum8/nmZ0hrPwTZ7CHKRmDoDbwQqAl46KdgSmfwSI93ErohwYcDIsDKDw+LS3f0kt2Z9vL5vJLBbWeeMmWYGSHFqoDsJ43MjxQNPXk9XxBEK8d8gI0EqEGwgn2/ZjQ/ZSyeixbdYQck5XKPZEFYo2cYk+AQIDAQAB",
   "description": "Context-Aware Movie Rating for IMDb",
   "action": {
     "default_popup": "index.html"
@@ -21,8 +22,16 @@
     }
   ],
   "permissions": [
-    "storage"
+    "storage",
+    "identity"
   ],
+  "oauth2": {
+    "client_id": "355211286136-er2imar4gitj7ugctimcoorr2ks9l9ng.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
   },
