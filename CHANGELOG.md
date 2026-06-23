@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-06-23
+
+### Fixed
+- Fixed an issue where the Cloud Sync Mongoose backend schema was silently dropping `title` and `posterUrl` fields, causing movie posters and titles to disappear in the Dashboard after syncing.
+- Fixed a `TypeError: Cannot read properties of undefined` crash in the Dashboard's search bar caused by attempting to search over legacy ratings that lacked a stored title.
+- Hardened the IMDb title DOM scraping logic to gracefully extract movie titles even when the page structure dynamically changes.
+
 ## [1.3.0] - 2026-06-22
 
 ### Added
