@@ -9,6 +9,8 @@ const presetSchema = new mongoose.Schema({
 
 const ratingSchema = new mongoose.Schema({
   movieId: { type: String, required: true },
+  title: { type: String },
+  posterUrl: { type: String },
   overall: { type: Number, required: true },
   scores: { type: Map, of: Number },
   updatedAt: { type: Date, default: Date.now }
