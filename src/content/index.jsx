@@ -96,7 +96,7 @@ function injectHeroTrigger() {
   const movieId = movieIdMatch[1]
 
   const h1 = document.querySelector('h1[data-testid="hero__pageTitle"]')
-  const title = h1 ? h1.innerText : document.title.split(' - ')[0]
+  const title = h1 ? h1.textContent.trim() : document.title.split(' - ')[0]
 
   let posterUrl = ''
   const metaImg = document.querySelector('meta[property="og:image"]')
