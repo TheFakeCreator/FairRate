@@ -95,18 +95,6 @@ function injectHeroTrigger() {
   if (!movieIdMatch) return
   const movieId = movieIdMatch[1]
 
-  const h1 = document.querySelector('h1[data-testid="hero__pageTitle"]')
-  const title = h1 ? h1.textContent.trim() : document.title.split(' - ')[0]
-
-  let posterUrl = ''
-  const metaImg = document.querySelector('meta[property="og:image"]')
-  if (metaImg && metaImg.content) {
-    posterUrl = metaImg.content
-  } else {
-    const posterImg = document.querySelector('.ipc-poster img, [data-testid="hero-media__poster"] img')
-    posterUrl = posterImg ? (posterImg.getAttribute('src') || '') : ''
-  }
-
   const wrapper = document.createElement('div')
   wrapper.id = 'fairrate-hero-wrapper'
   wrapper.className = 'sc-a3dab77e-0 kQVFoB rating-bar__base-button hover:bg-white/10 transition-colors cursor-pointer'
@@ -120,7 +108,20 @@ function injectHeroTrigger() {
     </div>
   `
   
-  wrapper.onclick = () => openModal(movieId, title, posterUrl)
+  wrapper.onclick = () => {
+    const h1 = document.querySelector('h1[data-testid="hero__pageTitle"]')
+    const title = h1 ? h1.textContent.trim() : document.title.split(' - ')[0]
+
+    let posterUrl = ''
+    const metaImg = document.querySelector('meta[property="og:image"]')
+    if (metaImg && metaImg.content) {
+      posterUrl = metaImg.content
+    } else {
+      const posterImg = document.querySelector('.ipc-poster img, [data-testid="hero-media__poster"] img')
+      posterUrl = posterImg ? (posterImg.getAttribute('src') || '') : ''
+    }
+    openModal(movieId, title, posterUrl)
+  }
 
   if (heroBtn.parentNode) {
     heroBtn.parentNode.insertBefore(wrapper, heroBtn.nextSibling)
