@@ -135,7 +135,7 @@ function OptionsPage() {
     await handleSavePreset(presetId, newWeights);
   }
 
-  const filteredRatings = ratings.filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredRatings = ratings.filter(r => (r.title || '').toLowerCase().includes((searchQuery || '').toLowerCase()))
 
   return (
     <div className="flex h-screen bg-imdb-dark text-white font-sans selection:bg-imdb-yellow selection:text-black">
