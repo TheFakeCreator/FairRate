@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ZAxis } from 'recharts';
 import { ActivityCalendar } from 'react-activity-calendar';
 import { TrendingUp, Film, Star } from 'lucide-react';
 
@@ -12,43 +12,31 @@ export default function AnalyticsTab({ ratings }) {
     const total = ratings.length;
     const average = (ratings.reduce((acc, r) => acc + Number(r.overall), 0) / total).toFixed(1);
 
-    // Distribution (0-10)
-    const distMap = Array.from({ length: 11 }, (_, i) => ({ score: i, count: 0 }));
-    ratings.forEach(r => {
-      const rounded = Math.round(Number(r.overall));
-      if (rounded >= 0 && rounded <= 10) {
-        distMap[rounded].count += 1;
-      }
-    });
+    // Scatter Data
+    const scatterData = ratings
+      .filter(r => r.overall !== undefined)
+      .map((r, i) => {
+        const time = r.updatedAt ? new Date(r.updatedAt).getTime() : new Date().getTime() - i * 86400000;
+        return {
+          title: r.title,
+          time: time,
+          score: Number(r.overall)
+        };
+      })
+      .sort((a, b) => a.time - b.time); // sort chronologically
 
-    // Activity Calendar
-    const activityMap = {};
-    ratings.forEach(r => {
-      // Assuming updatedAt is ISO string. If missing, fallback to today.
-      const dateStr = r.updatedAt ? r.updatedAt.split('T')[0] : new Date().toISOString().split('T')[0];
-      activityMap[dateStr] = (activityMap[dateStr] || 0) + 1;
-    });
-
-    const activity = Object.keys(activityMap).map(date => ({
-      date,
-      count: activityMap[date],
-      level: Math.min(4, Math.ceil(activityMap[date] / 2)) // simple scaling
-    }));
-
-    // react-activity-calendar requires at least one data point to render properly usually
-    if (activity.length === 0) {
-      activity.push({ date: new Date().toISOString().split('T')[0], count: 0, level: 0 });
-    }
-
-    return { total, average, distribution: distMap, activity };
+    return { total, average, scatter: scatterData, activity };
   }, [ratings]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const dateStr = new Date(data.time).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
       return (
         <div className="bg-imdb-darker border border-imdb-border p-3 rounded-lg shadow-xl text-white">
-          <p className="font-bold text-imdb-yellow mb-1">Score: {payload[0].payload.score}</p>
-          <p className="text-sm text-gray-300">{payload[0].value} movies</p>
+          <p className="font-bold text-imdb-yellow mb-1 text-base">{data.title}</p>
+          <p className="text-sm text-gray-300">Score: <span className="font-bold text-white">{data.score}</span></p>
+          <p className="text-xs text-gray-500 mt-1">{dateStr}</p>
         </div>
       );
     }
@@ -108,8 +96,8 @@ export default function AnalyticsTab({ ratings }) {
                 <ActivityCalendar 
                   data={stats.activity} 
                   theme={{
-                    light: ['#333333', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518'],
-                    dark: ['#333333', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518']
+                    light: ['#404040', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518'],
+                    dark: ['#404040', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518']
                   }}
                   colorScheme="dark"
                   labels={{
@@ -122,30 +110,32 @@ export default function AnalyticsTab({ ratings }) {
             </div>
           </div>
 
-          {/* Distribution Chart */}
+          {/* Scatter Plot Chart */}
           <div className="bg-imdb-dark border border-imdb-border rounded-xl p-8 shadow-lg">
-            <h3 className="text-xl font-bold mb-6 text-gray-200">Score Distribution</h3>
-            <div className="h-[300px] w-full">
+            <h3 className="text-xl font-bold mb-6 text-gray-200">Rating Timeline</h3>
+            <div className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.distribution} margin={{ top: 20, right: 30, left: -20, bottom: 5 }}>
+                <ScatterChart margin={{ top: 20, right: 30, left: -20, bottom: 20 }}>
                   <XAxis 
-                    dataKey="score" 
-                    tick={{ fill: '#666', fontWeight: 'bold' }} 
+                    dataKey="time" 
+                    type="number"
+                    domain={['dataMin - 86400000', 'dataMax + 86400000']}
+                    tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString(undefined, { month: 'short' })}
+                    tick={{ fill: '#666', fontSize: 12, fontWeight: 'bold' }} 
                     axisLine={{ stroke: '#333' }}
                     tickLine={false}
+                    dy={10}
                   />
                   <YAxis 
-                    tick={{ fill: '#666' }} 
+                    dataKey="score" 
+                    domain={[0, 10]} 
+                    tick={{ fill: '#666', fontSize: 12 }} 
                     axisLine={{ stroke: '#333' }}
                     tickLine={false}
                   />
-                  <Tooltip cursor={{ fill: '#ffffff0a' }} content={<CustomTooltip />} />
-                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                    {stats.distribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.count > 0 ? '#f5c518' : '#333'} />
-                    ))}
-                  </Bar>
-                </BarChart>
+                  <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#333' }} content={<CustomTooltip />} />
+                  <Scatter data={stats.scatter} fill="#f5c518" line={false} shape="circle" />
+                </ScatterChart>
               </ResponsiveContainer>
             </div>
           </div>
