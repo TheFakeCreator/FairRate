@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
-import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X, Upload } from 'lucide-react'
+import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X, Upload, TrendingUp } from 'lucide-react'
 import { getAllRatings, getPresets, savePresets, pullFromCloud, pushToCloud, searchUser, toggleFollow, getFollowing, deleteRating, batchImportIMDbRatings } from '../lib/storage'
 import { signInWithGoogle, signOut, getUser } from '../lib/auth'
+import AnalyticsTab from './AnalyticsTab'
 import '../content/styles.css'
 
 const DEFAULT_ASPECTS_META = {
@@ -318,6 +319,13 @@ function OptionsPage() {
             <Users className="w-5 h-5" />
             Friends
           </button>
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-md transition-colors font-medium ${activeTab === 'analytics' ? 'bg-imdb-border text-imdb-yellow' : 'text-gray-400 hover:bg-imdb-border/50 hover:text-white'}`}
+          >
+            <TrendingUp className="w-5 h-5" />
+            Insights
+          </button>
         </nav>
 
         {/* User Auth Section */}
@@ -492,8 +500,10 @@ function OptionsPage() {
               </div>
             )}
           </div>
+        ) : activeTab === 'analytics' ? (
+          <AnalyticsTab ratings={ratings} />
         ) : activeTab === 'presets' ? (
-          <div className="p-8 max-w-5xl mx-auto space-y-8">
+          <div className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-300">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-bold">Custom Presets</h2>
