@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ZAxis } from 'recharts';
 import { ActivityCalendar } from 'react-activity-calendar';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import { TrendingUp, Film, Star } from 'lucide-react';
 
 export default function AnalyticsTab({ ratings }) {
@@ -131,6 +133,16 @@ export default function AnalyticsTab({ ratings }) {
                   }}
                   hideTotalCount={false}
                   showWeekdayLabels
+                  renderBlock={(block, activity) => (
+                    React.cloneElement(block, {
+                      'data-tooltip-id': 'heatmap-tooltip',
+                      'data-tooltip-html': `<strong>${activity.count} ratings</strong> on ${new Date(activity.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+                    })
+                  )}
+                />
+                <ReactTooltip 
+                  id="heatmap-tooltip" 
+                  style={{ backgroundColor: '#222', color: '#fff', borderRadius: '8px', zIndex: 100 }} 
                 />
               </div>
             </div>
