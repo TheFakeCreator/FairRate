@@ -26,7 +26,7 @@ export default function AnalyticsTab({ ratings }) {
     loadPresets();
   }, []);
 
-  const stats = useMemo(() => {
+    const stats = useMemo(() => {
     if (!ratings || ratings.length === 0) {
       return { total: 0, average: 0, distribution: [], activity: [], presets: [], daysData: [], hallOfFame: [], avgBias: null };
     }
@@ -60,6 +60,34 @@ export default function AnalyticsTab({ ratings }) {
         daysData[d.getDay()].count += 1;
       }
     });
+
+    // Rating Distribution
+    const distCounts = { 10: 0, 9: 0, 8: 0, 7: 0, 6: 0, 5: 0 };
+    ratings.forEach(r => {
+      if (r.overall !== undefined) {
+        const s = Number(r.overall);
+        if (s >= 9.5) distCounts[10]++;
+        else if (s >= 8.5) distCounts[9]++;
+        else if (s >= 7.5) distCounts[8]++;
+        else if (s >= 6.5) distCounts[7]++;
+        else if (s >= 5.5) distCounts[6]++;
+        else if (s > 0) distCounts[5]++;
+      }
+    });
+    
+    let maxDistCount = 0;
+    const distribution = [10, 9, 8, 7, 6, 5].map(bucket => {
+      const count = distCounts[bucket];
+      if (count > maxDistCount) maxDistCount = count;
+      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+      return {
+        label: bucket === 5 ? '5↓' : bucket.toString(),
+        isStar: bucket !== 5,
+        count,
+        pct
+      };
+    });
+    const distMax = maxDistCount;
 
     // Scatter Data
     const scatterData = ratings
@@ -143,7 +171,7 @@ export default function AnalyticsTab({ ratings }) {
       return { ...p, radarData };
     });
 
-    return { total, average, scatter: scatterData, activity, presets, daysData, hallOfFame, avgBias };
+    return { total, average, scatter: scatterData, activity, presets, daysData, hallOfFame, avgBias, distribution, distMax };
   }, [ratings, globalPresets]);
 
   useEffect(() => {
@@ -346,33 +374,62 @@ export default function AnalyticsTab({ ratings }) {
             </div>
           </div>
 
-          {/* Scatter Plot Chart */}
-          <div className="bg-imdb-dark border border-imdb-border rounded-xl p-8 shadow-lg">
-            <h3 className="text-xl font-bold mb-6 text-gray-200">Rating Timeline</h3>
-            <div className="h-[350px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 20, right: 30, left: -20, bottom: 20 }}>
-                  <XAxis 
-                    dataKey="time" 
-                    type="number"
-                    domain={['dataMin', 'dataMax']}
-                    tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString(undefined, { month: 'short' })}
-                    tick={{ fill: '#666', fontSize: 12, fontWeight: 'bold' }} 
-                    axisLine={{ stroke: '#333' }}
-                    tickLine={false}
-                    dy={10}
-                  />
-                  <YAxis 
-                    dataKey="score" 
-                    domain={[0, 10]} 
-                    tick={{ fill: '#666', fontSize: 12 }} 
-                    axisLine={{ stroke: '#333' }}
-                    tickLine={false}
-                  />
-                  <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#333' }} content={<CustomTooltip />} />
-                  <Scatter data={stats.scatter} fill="#f5c518" line={{ stroke: '#f5c518', strokeWidth: 2, opacity: 0.5 }} shape="circle" />
-                </ScatterChart>
-              </ResponsiveContainer>
+          {/* Distribution & Timeline */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            {/* Rating Distribution */}
+            <div className="bg-imdb-dark border border-imdb-border rounded-xl p-8 shadow-lg flex flex-col xl:col-span-1">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-gray-200 mb-1">Rating Distribution</h3>
+                <p className="text-xs text-gray-400">Shows if you are a harsh or generous reviewer.</p>
+              </div>
+              <div className="flex-1 flex flex-col justify-center space-y-3">
+                {stats.distribution.map((d, i) => (
+                  <div key={i} className="flex items-center gap-4 text-sm font-medium">
+                    <div className="w-12 text-right text-gray-300 flex items-center justify-end gap-1 shrink-0">
+                      {d.label} {d.isStar ? <Star className="w-3 h-3 fill-current" /> : ''}
+                    </div>
+                    <div className="flex-1 h-5 bg-imdb-darker rounded-sm overflow-hidden flex">
+                      <div 
+                        className="h-full bg-imdb-yellow transition-all duration-1000" 
+                        style={{ width: `${stats.distMax > 0 ? (d.count / stats.distMax) * 100 : 0}%` }}
+                      ></div>
+                    </div>
+                    <div className="w-10 text-gray-400 shrink-0">
+                      {d.pct}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scatter Plot Chart */}
+            <div className="bg-imdb-dark border border-imdb-border rounded-xl p-8 shadow-lg xl:col-span-2">
+              <h3 className="text-xl font-bold mb-6 text-gray-200">Rating Timeline</h3>
+              <div className="h-[350px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 20, right: 30, left: -20, bottom: 20 }}>
+                    <XAxis 
+                      dataKey="time" 
+                      type="number"
+                      domain={['dataMin', 'dataMax']}
+                      tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString(undefined, { month: 'short' })}
+                      tick={{ fill: '#666', fontSize: 12, fontWeight: 'bold' }} 
+                      axisLine={{ stroke: '#333' }}
+                      tickLine={false}
+                      dy={10}
+                    />
+                    <YAxis 
+                      dataKey="score" 
+                      domain={[0, 10]} 
+                      tick={{ fill: '#666', fontSize: 12 }} 
+                      axisLine={{ stroke: '#333' }}
+                      tickLine={false}
+                    />
+                    <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#333' }} content={<CustomTooltip />} />
+                    <Scatter data={stats.scatter} fill="#f5c518" line={{ stroke: '#f5c518', strokeWidth: 2, opacity: 0.5 }} shape="circle" />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
 
