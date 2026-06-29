@@ -10,20 +10,45 @@ export default function AnalyticsTab({ ratings }) {
     }
 
     const total = ratings.length;
-    const average = (ratings.reduce((acc, r) => acc + Number(r.overall), 0) / total).toFixed(1);
+    const average = (ratings.reduce((acc, r) => acc + (Number(r.overall) || 0), 0) / total).toFixed(1);
 
     // Scatter Data
     const scatterData = ratings
-      .filter(r => r.overall !== undefined)
+      .filter(r => r.overall !== undefined && r.overall !== null)
       .map((r, i) => {
-        const time = r.updatedAt ? new Date(r.updatedAt).getTime() : new Date().getTime() - i * 86400000;
+        let time = new Date().getTime() - i * 86400000;
+        if (r.updatedAt) {
+          const parsed = new Date(r.updatedAt).getTime();
+          if (!isNaN(parsed)) time = parsed;
+        }
         return {
           title: r.title,
           time: time,
-          score: Number(r.overall)
+          score: Number(r.overall) || 0
         };
       })
       .sort((a, b) => a.time - b.time); // sort chronologically
+
+    // Activity Calendar
+    const activityMap = {};
+    ratings.forEach(r => {
+      // Assuming updatedAt is ISO string. If missing, fallback to today.
+      const dateStr = r.updatedAt ? r.updatedAt.split('T')[0] : new Date().toISOString().split('T')[0];
+      activityMap[dateStr] = (activityMap[dateStr] || 0) + 1;
+    });
+
+    const activity = Object.keys(activityMap)
+      .sort((a, b) => new Date(a) - new Date(b)) // MUST sort chronologically for react-activity-calendar
+      .map(date => ({
+        date,
+        count: activityMap[date],
+        level: Math.min(4, Math.ceil(activityMap[date] / 2)) // simple scaling
+      }));
+
+    // react-activity-calendar requires at least one data point
+    if (activity.length === 0) {
+      activity.push({ date: new Date().toISOString().split('T')[0], count: 0, level: 0 });
+    }
 
     return { total, average, scatter: scatterData, activity };
   }, [ratings]);
@@ -119,7 +144,7 @@ export default function AnalyticsTab({ ratings }) {
                   <XAxis 
                     dataKey="time" 
                     type="number"
-                    domain={['dataMin - 86400000', 'dataMax + 86400000']}
+                    domain={['dataMin', 'dataMax']}
                     tickFormatter={(unixTime) => new Date(unixTime).toLocaleDateString(undefined, { month: 'short' })}
                     tick={{ fill: '#666', fontSize: 12, fontWeight: 'bold' }} 
                     axisLine={{ stroke: '#333' }}
