@@ -143,9 +143,16 @@ export default function AnalyticsTab({ ratings }) {
           
           // 1. Try to get it from globalPresets (Custom Aspects)
           const globalPreset = globalPresets.find(p => p.id === pId);
+          
+          // Skip if this aspect was removed from the preset configuration
+          if (globalPreset && !globalPreset.weights[aspectId]) {
+            return;
+          }
+
           if (globalPreset && globalPreset.aspectMeta && globalPreset.aspectMeta[aspectId]) {
             aspectName = globalPreset.aspectMeta[aspectId].label;
           } 
+
           // 2. Fallback to default meta (Built-in Aspects)
           else if (DEFAULT_ASPECTS_META[aspectId]) {
             aspectName = DEFAULT_ASPECTS_META[aspectId].label;
@@ -163,11 +170,15 @@ export default function AnalyticsTab({ ratings }) {
     });
     
     const presets = Object.values(presetsMap).map(p => {
-      const radarData = Object.keys(p.aspects).map(aspect => ({
-        subject: aspect,
-        A: Number((p.aspects[aspect].total / p.aspects[aspect].count).toFixed(1)),
-        fullMark: 10
-      }));
+      const radarData = Object.keys(p.aspects).map(aspect => {
+        // Capitalize the first letter of each word to fix lowercase user inputs
+        const prettyAspect = aspect.replace(/\b\w/g, c => c.toUpperCase());
+        return {
+          subject: prettyAspect,
+          A: Number((p.aspects[aspect].total / p.aspects[aspect].count).toFixed(1)),
+          fullMark: 10
+        };
+      });
       return { ...p, radarData };
     });
 

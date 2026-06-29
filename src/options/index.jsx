@@ -539,7 +539,12 @@ function OptionsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                     {Object.entries(preset.weights).map(([aspect, weight]) => {
                       const meta = preset.aspectMeta?.[aspect];
-                      const displayLabel = meta ? meta.label : aspect;
+                      let displayLabel = aspect;
+                      if (meta) {
+                        displayLabel = meta.label;
+                      } else if (DEFAULT_ASPECTS_META[aspect]) {
+                        displayLabel = DEFAULT_ASPECTS_META[aspect].label;
+                      }
                       
                       return (
                       <div key={aspect} className="space-y-2 group">
