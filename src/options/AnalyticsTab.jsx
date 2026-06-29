@@ -298,6 +298,8 @@ export default function AnalyticsTab({ ratings }) {
                     <Tooltip 
                       cursor={{ fill: '#ffffff0a' }} 
                       contentStyle={{ backgroundColor: '#222', borderColor: '#444', borderRadius: '8px', color: '#fff' }}
+                      itemStyle={{ color: '#aaa' }}
+                      labelStyle={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}
                       formatter={(value) => [`${value} ratings`, 'Activity']}
                     />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]}>
