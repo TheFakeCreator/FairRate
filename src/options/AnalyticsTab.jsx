@@ -4,9 +4,27 @@ import { ActivityCalendar } from 'react-activity-calendar';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import { TrendingUp, Film, Star, Award, BarChart2, CalendarDays } from 'lucide-react';
+import { getPresets } from '../lib/storage';
+
+const DEFAULT_ASPECTS_META = {
+  enjoyment: { label: 'Enjoyment & Pacing' },
+  story: { label: 'Story & Plot' },
+  characters: { label: 'Characters & Acting' },
+  technical: { label: 'Technical Execution' },
+  emotional: { label: 'Emotional Impact' },
+};
 
 export default function AnalyticsTab({ ratings }) {
   const [selectedPresetId, setSelectedPresetId] = useState(null);
+  const [globalPresets, setGlobalPresets] = useState([]);
+
+  useEffect(() => {
+    async function loadPresets() {
+      const p = await getPresets();
+      setGlobalPresets(p);
+    }
+    loadPresets();
+  }, []);
 
   const stats = useMemo(() => {
     if (!ratings || ratings.length === 0) {
@@ -94,9 +112,21 @@ export default function AnalyticsTab({ ratings }) {
       if (r.scores) {
         Object.entries(r.scores).forEach(([aspectId, score]) => {
           let aspectName = aspectId;
-          if (r.weights && r.weights[aspectId] && r.weights[aspectId].name) {
+          
+          // 1. Try to get it from globalPresets (Custom Aspects)
+          const globalPreset = globalPresets.find(p => p.id === pId);
+          if (globalPreset && globalPreset.aspectMeta && globalPreset.aspectMeta[aspectId]) {
+            aspectName = globalPreset.aspectMeta[aspectId].label;
+          } 
+          // 2. Fallback to default meta (Built-in Aspects)
+          else if (DEFAULT_ASPECTS_META[aspectId]) {
+            aspectName = DEFAULT_ASPECTS_META[aspectId].label;
+          }
+          // 3. Fallback to raw ID or r.weights
+          else if (r.weights && r.weights[aspectId] && r.weights[aspectId].name) {
             aspectName = r.weights[aspectId].name;
           }
+
           if (!presetsMap[pId].aspects[aspectName]) presetsMap[pId].aspects[aspectName] = { total: 0, count: 0 };
           presetsMap[pId].aspects[aspectName].total += Number(score);
           presetsMap[pId].aspects[aspectName].count += 1;
@@ -114,7 +144,7 @@ export default function AnalyticsTab({ ratings }) {
     });
 
     return { total, average, scatter: scatterData, activity, presets, daysData, hallOfFame, avgBias };
-  }, [ratings]);
+  }, [ratings, globalPresets]);
 
   useEffect(() => {
     if (stats.presets.length > 0 && !selectedPresetId) {
