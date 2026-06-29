@@ -63,13 +63,13 @@ export async function saveRating(movieId, ratingData) {
   }
 }
 /**
- * Silently update a poster without changing the updatedAt timestamp
+ * Silently update movie metadata (poster, rating) without changing the updatedAt timestamp
  */
-export async function updatePosterUrl(movieId, posterUrl) {
+export async function updateMovieMetadata(movieId, metadata) {
   if (!isExtensionContext) {
     return new Promise((resolve) => {
       chrome.runtime.sendMessage(
-        { action: "updatePoster", movieId, posterUrl },
+        { action: "updateMovieMetadata", movieId, metadata },
         resolve,
       );
     });
@@ -78,14 +78,12 @@ export async function updatePosterUrl(movieId, posterUrl) {
   try {
     const existing = await getRating(movieId);
     if (existing) {
-      existing.posterUrl = posterUrl;
+      Object.assign(existing, metadata);
       await ratingsStore.setItem(movieId, existing);
-      // Do not sync to cloud here to save quota for a simple image update, or we can.
-      // Let's not trigger a full cloud sync just for a lazy loaded poster.
     }
     return true;
   } catch (err) {
-    console.error("Failed to update poster:", err);
+    console.error("Failed to update movie metadata:", err);
     return false;
   }
 }

@@ -15,7 +15,7 @@ import {
   deleteRating,
   getAllRatings,
   batchImportIMDbRatings,
-  updatePosterUrl,
+  updateMovieMetadata,
 } from "../../lib/storage";
 
 export default function DashboardTab({
@@ -356,7 +356,18 @@ export default function DashboardTab({
               className="break-inside-avoid mb-6 bg-imdb-dark border border-imdb-border rounded-xl shadow-lg flex hover:border-imdb-yellow/50 transition-colors overflow-hidden group h-min"
             >
               {/* Full Height Poster */}
-              <LazyPoster movieId={r.movieId} initialPosterUrl={r.posterUrl} />
+              <LazyPoster
+                rating={r}
+                onUpdateRating={(movieId, metadata) => {
+                  setRatings((prev) =>
+                    prev.map((item) =>
+                      item.movieId === movieId
+                        ? { ...item, ...metadata }
+                        : item,
+                    ),
+                  );
+                }}
+              />
 
               {/* Right Side Info */}
               <div className="flex-1 flex flex-col p-5 relative">
@@ -446,40 +457,75 @@ export default function DashboardTab({
   );
 }
 
-function LazyPoster({ movieId, initialPosterUrl }) {
-  const [posterUrl, setPosterUrl] = useState(initialPosterUrl || "");
-  const [loading, setLoading] = useState(!initialPosterUrl);
+function LazyPoster({ rating, onUpdateRating }) {
+  const [posterUrl, setPosterUrl] = useState(rating.posterUrl || "");
+  const [loading, setLoading] = useState(false);
   const hasFetched = useRef(false);
 
   React.useEffect(() => {
-    if (initialPosterUrl && !initialPosterUrl.startsWith("data:image")) {
-      setPosterUrl(initialPosterUrl);
-      setLoading(false);
+    // Skip fetch if we already have a valid poster and an IMDb rating
+    if (
+      rating.posterUrl &&
+      !rating.posterUrl.startsWith("data:image") &&
+      rating.publicIMDbRating !== undefined
+    ) {
+      setPosterUrl(rating.posterUrl);
       return;
     }
 
     if (hasFetched.current) return;
     hasFetched.current = true;
+    setLoading(true);
 
-    async function fetchPoster() {
+    async function fetchMetadata() {
       try {
-        const res = await fetch(`https://www.imdb.com/title/${movieId}/`);
+        const res = await fetch(
+          `https://www.imdb.com/title/${rating.movieId}/`,
+        );
         const text = await res.text();
-        const match = text.match(/<meta property="og:image" content="(.*?)"/i);
-        if (match && match[1]) {
-          const fetchedUrl = match[1];
-          setPosterUrl(fetchedUrl);
-          updatePosterUrl(movieId, fetchedUrl).catch(console.error);
+
+        const metadata = {};
+        let metadataUpdated = false;
+
+        // 1. Extract Poster
+        if (!rating.posterUrl || rating.posterUrl.startsWith("data:image")) {
+          const match = text.match(
+            /<meta property="og:image" content="(.*?)"/i,
+          );
+          if (match && match[1]) {
+            const fetchedPoster = match[1];
+            setPosterUrl(fetchedPoster);
+            metadata.posterUrl = fetchedPoster;
+            metadataUpdated = true;
+          }
+        }
+
+        // 2. Extract IMDb Rating using DOMParser
+        if (rating.publicIMDbRating === undefined) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, "text/html");
+          const heroRating = doc.querySelector(
+            '[data-testid="hero-rating-bar__aggregate-rating__score"] > span:first-child',
+          );
+          if (heroRating && !isNaN(Number(heroRating.innerText))) {
+            metadata.publicIMDbRating = Number(heroRating.innerText);
+            metadataUpdated = true;
+          }
+        }
+
+        if (metadataUpdated) {
+          onUpdateRating(rating.movieId, metadata);
+          updateMovieMetadata(rating.movieId, metadata).catch(console.error);
         }
       } catch (err) {
-        console.error("Failed to fetch lazy poster for", movieId, err);
+        console.error("Failed to fetch lazy metadata for", rating.movieId, err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchPoster();
-  }, [movieId, initialPosterUrl]);
+    fetchMetadata();
+  }, [rating.movieId]);
 
   return (
     <div className="w-[120px] shrink-0 bg-[#222] border-r border-imdb-border relative flex items-center justify-center overflow-hidden">

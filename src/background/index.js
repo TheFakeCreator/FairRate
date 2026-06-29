@@ -4,7 +4,7 @@ import {
   savePresets,
   getPresets,
   deleteRating,
-  updatePosterUrl,
+  updateMovieMetadata,
 } from "../lib/storage";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -28,8 +28,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     getPresets().then(sendResponse);
     return true;
   }
-  if (request.action === "updatePoster") {
-    updatePosterUrl(request.movieId, request.posterUrl).then(sendResponse);
+  if (request.action === "updateMovieMetadata") {
+    updateMovieMetadata(request.movieId, request.metadata).then(sendResponse);
     return true;
   }
 });
