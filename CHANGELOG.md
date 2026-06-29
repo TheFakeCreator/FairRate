@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom aspects now perfectly preserve the exact case formatting typed by the user, rather than overriding them with default labels.
 - Users can now delete movie ratings from the Rating History dashboard, which automatically syncs the deletion to the cloud.
 - **Dynamic Share Cards**: Exported Rating cards now perfectly adapt to custom presets with high numbers of aspects (e.g. 10+ aspects), utilizing smart multi-column layouts and auto-height wrapping.
+- **Masonry Dashboard Layout**: Upgraded the Rating History grid to a Pinterest-style Bento/Masonry layout, ensuring cards with many aspects pack tightly without leaving awkward vertical gaps.
 
 ### Fixed
 - Fixed an issue where the weighted average score calculation in the modal was silently including hidden default aspects.

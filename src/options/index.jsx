@@ -433,9 +433,9 @@ function OptionsPage() {
                 <p className="text-gray-500 mt-2">Go to IMDb and start rating movies!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="columns-1 md:columns-2 lg:columns-3 gap-6">
                 {filteredRatings.map(r => (
-                  <div key={r.movieId} className="bg-imdb-dark border border-imdb-border rounded-xl shadow-lg flex hover:border-imdb-yellow/50 transition-colors overflow-hidden group">
+                  <div key={r.movieId} className="break-inside-avoid mb-6 bg-imdb-dark border border-imdb-border rounded-xl shadow-lg flex hover:border-imdb-yellow/50 transition-colors overflow-hidden group h-min">
                     {/* Full Height Poster */}
                     <div className="w-[120px] shrink-0 bg-[#222] border-r border-imdb-border relative flex items-center justify-center">
                       {r.posterUrl && !r.posterUrl.startsWith('data:image') ? (
