@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- **Analytics Overhaul**: The Insights Dashboard has been completely rebuilt with stunning data visualizations.
+- **Taste Profile (Radar Chart)**: A new glowing radar chart that plots your average scores across different preset aspects, complete with a preset selector dropdown.
+- **Rating Timeline**: A timeline scatter plot that tracks every decimal rating over time.
+- **Activity by Day**: A new bar chart analyzing what days of the week you rate movies.
+- **Hall of Fame**: A visual grid showcasing your top 10 highest-rated movies with interactive posters.
+- **Audience Alignment**: A new metric that silently scrapes the public IMDb rating when you rate a movie, comparing it to your personal score to determine your critic tendency (e.g., "Generous Rater" or "Tough Critic").
+- **Activity Heatmap Improvements**: Added `react-tooltip` for interactive hover data and fixed missing grid rendering on empty days.
 
 ### Added
 - **IMDb CSV Importer**: Power users can now instantly migrate thousands of ratings from IMDb via the new "Import CSV" button in the Rating History dashboard.
