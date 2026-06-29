@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **IMDb CSV Importer**: Power users can now instantly migrate thousands of ratings from IMDb via the new "Import CSV" button in the Rating History dashboard.
 - Users can now edit custom aspect names and optionally provide descriptions in the Options dashboard.
 - Custom aspects now perfectly preserve the exact case formatting typed by the user, rather than overriding them with default labels.
 - Users can now delete movie ratings from the Rating History dashboard, which automatically syncs the deletion to the cloud.
+- **Dynamic Share Cards**: Exported Rating cards now perfectly adapt to custom presets with high numbers of aspects (e.g. 10+ aspects), utilizing smart multi-column layouts and auto-height wrapping.
 
 ### Fixed
 - Fixed an issue where the weighted average score calculation in the modal was silently including hidden default aspects.
