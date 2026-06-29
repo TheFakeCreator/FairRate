@@ -26,7 +26,7 @@ function Home() {
       <main className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-24 flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-imdb-yellow/10 border border-imdb-yellow/20 text-imdb-yellow text-sm font-bold tracking-wide uppercase mb-8">
           <Star className="w-4 h-4 fill-imdb-yellow" />
-          v1.4.0 is out now!
+          v1.4.1 is out now!
         </div>
 
         <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight leading-tight mb-8 max-w-4xl">
@@ -45,7 +45,7 @@ function Home() {
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <a
-            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.4.0.zip"
+            href="https://github.com/TheFakeCreator/FairRate/releases/latest/download/FairRate-v1.4.1.zip"
             onClick={handleDownload}
             className="flex items-center justify-center gap-3 bg-imdb-yellow text-black px-8 py-4 rounded-xl font-bold text-lg tracking-wider hover:bg-[#d8ad15] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(245,197,24,0.3)] w-full sm:w-auto"
           >
@@ -226,7 +226,7 @@ function Home() {
             className="flex items-center justify-center gap-3 bg-imdb-yellow text-black px-8 py-4 sm:px-10 sm:py-5 rounded-2xl font-black text-lg sm:text-xl tracking-wider hover:bg-[#d8ad15] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(245,197,24,0.4)] w-full sm:w-auto"
           >
             <Download className="w-6 h-6 shrink-0" />
-            Download FairRate v1.4.0
+            Download FairRate v1.4.1
           </a>
         </div>
       </section>
