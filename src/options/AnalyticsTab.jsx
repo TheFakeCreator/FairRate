@@ -32,22 +32,23 @@ export default function AnalyticsTab({ ratings }) {
     // Activity Calendar
     const activityMap = {};
     ratings.forEach(r => {
-      // Assuming updatedAt is ISO string. If missing, fallback to today.
       const dateStr = r.updatedAt ? r.updatedAt.split('T')[0] : new Date().toISOString().split('T')[0];
       activityMap[dateStr] = (activityMap[dateStr] || 0) + 1;
     });
 
-    const activity = Object.keys(activityMap)
-      .sort((a, b) => new Date(a) - new Date(b)) // MUST sort chronologically for react-activity-calendar
-      .map(date => ({
-        date,
-        count: activityMap[date],
-        level: Math.min(4, Math.ceil(activityMap[date] / 2)) // simple scaling
-      }));
-
-    // react-activity-calendar requires at least one data point
-    if (activity.length === 0) {
-      activity.push({ date: new Date().toISOString().split('T')[0], count: 0, level: 0 });
+    const activity = [];
+    const today = new Date();
+    // Generate exactly 365 days ago to today
+    for (let i = 365; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const count = activityMap[dateStr] || 0;
+      activity.push({
+        date: dateStr,
+        count: count,
+        level: count === 0 ? 0 : Math.min(4, Math.ceil(count / 2))
+      });
     }
 
     return { total, average, scatter: scatterData, activity };
