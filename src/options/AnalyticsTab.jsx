@@ -92,10 +92,14 @@ export default function AnalyticsTab({ ratings }) {
       }
       presetsMap[pId].count += 1;
       if (r.scores) {
-        Object.entries(r.scores).forEach(([aspect, score]) => {
-          if (!presetsMap[pId].aspects[aspect]) presetsMap[pId].aspects[aspect] = { total: 0, count: 0 };
-          presetsMap[pId].aspects[aspect].total += Number(score);
-          presetsMap[pId].aspects[aspect].count += 1;
+        Object.entries(r.scores).forEach(([aspectId, score]) => {
+          let aspectName = aspectId;
+          if (r.weights && r.weights[aspectId] && r.weights[aspectId].name) {
+            aspectName = r.weights[aspectId].name;
+          }
+          if (!presetsMap[pId].aspects[aspectName]) presetsMap[pId].aspects[aspectName] = { total: 0, count: 0 };
+          presetsMap[pId].aspects[aspectName].total += Number(score);
+          presetsMap[pId].aspects[aspectName].count += 1;
         });
       }
     });
