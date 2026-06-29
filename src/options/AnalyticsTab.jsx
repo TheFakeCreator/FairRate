@@ -478,6 +478,19 @@ export default function AnalyticsTab({ ratings }) {
             </div>
           )}
 
+          {/* Most Used Preset */}
+          <div className="bg-imdb-dark border border-imdb-border rounded-xl p-8 shadow-lg">
+            <h3 className="text-xl font-bold mb-6 text-gray-200">Your most used preset</h3>
+            <div className="space-y-4">
+              {[...stats.presets].sort((a, b) => b.count - a.count).slice(0, 3).map(p => (
+                <div key={p.id} className="flex flex-col">
+                  <span className="text-white font-medium mb-1">{p.name}</span>
+                  <span className="text-imdb-yellow font-bold text-xl leading-none">{stats.total > 0 ? Math.round((p.count / stats.total) * 100) : 0}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </>
       )}
     </div>
