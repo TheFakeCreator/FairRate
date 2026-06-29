@@ -2,7 +2,7 @@
   <img src="public/icons/icon128.png" width="100" alt="FairRate Logo" />
   <h1>FairRate - Context-Aware IMDb Ratings</h1>
   <p>A powerful Chrome extension that completely transforms how you rate movies on IMDb by breaking down ratings into 5 distinct cinematic aspects.</p>
-  
+
   <br />
   <a href="https://TheFakeCreator.github.io/FairRate/">
     <img src="https://img.shields.io/badge/Official%20Website-Visit%20Now-F5C518?style=for-the-badge&logo=googlechrome&logoColor=black" alt="Official Website" />
@@ -10,9 +10,12 @@
   <a href="https://github.com/sponsors/TheFakeCreator">
     <img src="https://img.shields.io/badge/Sponsor-Support%20Us-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor on GitHub" />
   </a>
+  <a href="https://ko-fi.com/thefakecreator">
+    <img src="https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white" alt="Support on Ko-fi" />
+  </a>
   <br /><br />
-  
-  **🎯 Current Goal: $5** to pay the developer fee and officially publish FairRate to the Chrome Web Store!
+
+**🎯 Current Goal: $5** to pay the developer fee and officially publish FairRate to the Chrome Web Store!
 </div>
 
 ## 🌟 Overview
@@ -27,44 +30,44 @@ FairRate completely syncs with your native IMDb account in the background—so y
 
 ![Movie Page](/public/images/heropage.png)
 <br>
-*The FairRate UI seamlessly injected directly into IMDb's native movie pages.*
+_The FairRate UI seamlessly injected directly into IMDb's native movie pages._
 
 <br><br>
 
 ![Rating Modal](/public/images/ratingmodal.png)
 <br>
-*The beautiful, context-aware rating modal with our 5 distinct cinematic categories.*
+_The beautiful, context-aware rating modal with our 5 distinct cinematic categories._
 
 <br><br>
 
 ![Export Card](/public/images/exportcard.png)
 <br>
-*Stunning, high-resolution rating cards generated dynamically for you to share online.*
+_Stunning, high-resolution rating cards generated dynamically for you to share online._
 
 <br><br>
 
 ![Popup Menu](/public/images/popup.png)
 <br>
-*Quick-access popup menu with IMDb-matching aesthetics for importing/exporting your data.*
+_Quick-access popup menu with IMDb-matching aesthetics for importing/exporting your data._
 
 <br><br>
 
 ![Dashboard](/public/images/dashboard.png)
 <br>
-*Your personal local dashboard to search, view, and manage your entire rating history.*
+_Your personal local dashboard to search, view, and manage your entire rating history._
 
 <br><br>
 
 ![Custom Presets](/public/images/custompresets.png)
 <br>
-*Create custom genre presets to assign custom weight multipliers based on your preferences.*
+_Create custom genre presets to assign custom weight multipliers based on your preferences._
 
 </div>
 
 ## ✨ Features
 
-- **🎬 Custom Rating Aspects:** Rate movies based on our 5 default aspects (*Enjoyment*, *Story*, *Characters*, *Technical*, *Emotional*) or create your own completely custom rating categories for different genres!
-- **⚖️ Custom Weighting:** Are you an action junkie? Create custom genre presets in your dashboard that assign higher multipliers to *Technical* or *Enjoyment* scores!
+- **🎬 Custom Rating Aspects:** Rate movies based on our 5 default aspects (_Enjoyment_, _Story_, _Characters_, _Technical_, _Emotional_) or create your own completely custom rating categories for different genres!
+- **⚖️ Custom Weighting:** Are you an action junkie? Create custom genre presets in your dashboard that assign higher multipliers to _Technical_ or _Enjoyment_ scores!
 - **☁️ Cloud Sync:** Sign in with Google to automatically backup and sync your ratings and presets across devices!
 - **👥 Social Features:** Search for friends by email and follow them! View your friends' ratings for a movie natively alongside yours in the IMDb rating modal.
 - **📈 Advanced Analytics:** Discover your movie taste profile with beautiful data visualizations! Features a glowing radar chart of your favorite aspects, a timeline of your ratings, a day-of-week activity chart, and a GitHub-style rating heatmap.
