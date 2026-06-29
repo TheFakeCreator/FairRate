@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
-import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X, Upload, TrendingUp } from 'lucide-react'
+import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X, Upload, TrendingUp, Filter, ArrowUpDown, Calendar, Activity } from 'lucide-react'
 import { getAllRatings, getPresets, savePresets, pullFromCloud, pushToCloud, searchUser, toggleFollow, getFollowing, deleteRating, batchImportIMDbRatings } from '../lib/storage'
 import { signInWithGoogle, signOut, getUser } from '../lib/auth'
 import AnalyticsTab from './AnalyticsTab'
@@ -28,6 +28,13 @@ function OptionsPage() {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [latestVersion, setLatestVersion] = useState('')
   const [editingAspect, setEditingAspect] = useState(null)
+  
+  // Filter States
+  const [filterPresetId, setFilterPresetId] = useState('all')
+  const [filterMinScore, setFilterMinScore] = useState('0')
+  const [filterDateRange, setFilterDateRange] = useState('all')
+  const [filterBias, setFilterBias] = useState('all')
+  const [sortBy, setSortBy] = useState('date_desc')
   
   const fileInputRef = useRef(null)
   const [importProgress, setImportProgress] = useState(null)
@@ -286,7 +293,49 @@ function OptionsPage() {
     reader.readAsText(file);
   }
 
-  const filteredRatings = ratings.filter(r => (r.title || '').toLowerCase().includes((searchQuery || '').toLowerCase()))
+  const filteredRatings = ratings.filter(r => {
+    // 1. Search filter
+    if (searchQuery && !(r.title || '').toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    
+    // 2. Preset filter
+    if (filterPresetId !== 'all' && (r.presetId || 'default') !== filterPresetId) return false;
+    
+    // 3. Min Score filter
+    if (filterMinScore !== '0' && Number(r.overall) < Number(filterMinScore)) return false;
+    
+    // 4. Date Range filter
+    if (filterDateRange !== 'all') {
+      const ratingDate = r.updatedAt ? new Date(r.updatedAt) : new Date(0);
+      const now = new Date();
+      if (filterDateRange === '7days') {
+        const sevenDaysAgo = new Date(now.setDate(now.getDate() - 7));
+        if (ratingDate < sevenDaysAgo) return false;
+      } else if (filterDateRange === '30days') {
+        const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+        if (ratingDate < thirtyDaysAgo) return false;
+      } else if (filterDateRange === 'thisYear') {
+        const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+        if (ratingDate < startOfYear) return false;
+      }
+    }
+    
+    // 5. Bias filter
+    if (filterBias !== 'all') {
+      if (!r.publicIMDbRating) return false;
+      const delta = Number(r.overall) - r.publicIMDbRating;
+      if (filterBias === 'underrated' && delta < 1.0) return false; // Must be >= 1.0 higher than IMDb
+      if (filterBias === 'overrated' && delta > -1.0) return false; // Must be <= -1.0 lower than IMDb
+    }
+    
+    return true;
+  }).sort((a, b) => {
+    if (sortBy === 'date_desc') return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+    if (sortBy === 'date_asc') return new Date(a.updatedAt || 0) - new Date(b.updatedAt || 0);
+    if (sortBy === 'score_desc') return Number(b.overall) - Number(a.overall);
+    if (sortBy === 'score_asc') return Number(a.overall) - Number(b.overall);
+    if (sortBy === 'title_asc') return (a.title || '').localeCompare(b.title || '');
+    return 0;
+  });
 
   return (
     <div className="flex h-screen bg-imdb-dark text-white font-sans selection:bg-imdb-yellow selection:text-black">
@@ -434,6 +483,87 @@ function OptionsPage() {
               </div>
             </div>
 
+            {/* Filter Bar */}
+            <div className="bg-imdb-dark border border-imdb-border rounded-xl p-4 flex flex-wrap items-center gap-4 shadow-sm">
+              <div className="flex items-center gap-2 text-gray-400 font-medium text-sm border-r border-imdb-border pr-4 mr-2">
+                <Filter className="w-4 h-4" /> Filters
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-gray-500" />
+                <select 
+                  value={filterPresetId} 
+                  onChange={e => setFilterPresetId(e.target.value)}
+                  className="bg-imdb-darker border border-imdb-border text-gray-300 text-sm rounded-lg focus:ring-imdb-yellow focus:border-imdb-yellow p-2 outline-none appearance-none pr-8 cursor-pointer"
+                >
+                  <option value="all">All Presets</option>
+                  {presets.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                  <option value="default">Default</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-gray-500" />
+                <select 
+                  value={filterMinScore} 
+                  onChange={e => setFilterMinScore(e.target.value)}
+                  className="bg-imdb-darker border border-imdb-border text-gray-300 text-sm rounded-lg focus:ring-imdb-yellow focus:border-imdb-yellow p-2 outline-none appearance-none pr-8 cursor-pointer"
+                >
+                  <option value="0">Any Score</option>
+                  <option value="9">9+ Masterpiece</option>
+                  <option value="8">8+ Great</option>
+                  <option value="7">7+ Good</option>
+                  <option value="5">5+ Average</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                <select 
+                  value={filterDateRange} 
+                  onChange={e => setFilterDateRange(e.target.value)}
+                  className="bg-imdb-darker border border-imdb-border text-gray-300 text-sm rounded-lg focus:ring-imdb-yellow focus:border-imdb-yellow p-2 outline-none appearance-none pr-8 cursor-pointer"
+                >
+                  <option value="all">Any Time</option>
+                  <option value="7days">Last 7 Days</option>
+                  <option value="30days">Last 30 Days</option>
+                  <option value="thisYear">This Year</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-gray-500" />
+                <select 
+                  value={filterBias} 
+                  onChange={e => setFilterBias(e.target.value)}
+                  className="bg-imdb-darker border border-imdb-border text-gray-300 text-sm rounded-lg focus:ring-imdb-yellow focus:border-imdb-yellow p-2 outline-none appearance-none pr-8 cursor-pointer"
+                >
+                  <option value="all">Any Bias</option>
+                  <option value="underrated">Underrated by Audience (Your Score is Higher)</option>
+                  <option value="overrated">Overrated by Audience (Your Score is Lower)</option>
+                </select>
+              </div>
+
+              <div className="flex-1"></div>
+
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="w-4 h-4 text-gray-500" />
+                <select 
+                  value={sortBy} 
+                  onChange={e => setSortBy(e.target.value)}
+                  className="bg-imdb-darker border border-imdb-border text-gray-300 text-sm rounded-lg focus:ring-imdb-yellow focus:border-imdb-yellow p-2 outline-none appearance-none pr-8 cursor-pointer font-bold text-imdb-yellow"
+                >
+                  <option value="date_desc">Newest First</option>
+                  <option value="date_asc">Oldest First</option>
+                  <option value="score_desc">Highest Rated</option>
+                  <option value="score_asc">Lowest Rated</option>
+                  <option value="title_asc">Title (A-Z)</option>
+                </select>
+              </div>
+            </div>
+
             {filteredRatings.length === 0 ? (
               <div className="text-center py-20 bg-imdb-dark rounded-xl border border-imdb-border">
                 <Star className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -466,9 +596,20 @@ function OptionsPage() {
                         <a href={`https://www.imdb.com/title/${r.movieId}/`} target="_blank" rel="noreferrer" className="text-lg font-bold hover:text-imdb-yellow transition-colors line-clamp-2 leading-tight">
                           {r.title}
                         </a>
-                        <div className="bg-imdb-darker px-3 py-2 rounded-lg border border-imdb-border text-center shrink-0">
+                        <div className="bg-imdb-darker px-3 py-2 rounded-lg border border-imdb-border text-center shrink-0 flex flex-col items-center justify-center min-w-[64px]">
                           <div className="text-2xl font-black text-white leading-none">{r.overall}</div>
                           <div className="text-[10px] text-imdb-yellow uppercase font-bold tracking-wider mt-1">Score</div>
+                          {(() => {
+                            if (!r.publicIMDbRating) return null;
+                            const delta = Number(r.overall) - r.publicIMDbRating;
+                            if (Math.abs(delta) < 0.1) return null;
+                            const isPos = delta > 0;
+                            return (
+                              <div className={`text-[10px] font-bold mt-1 bg-[#111] px-1.5 rounded ${isPos ? 'text-green-500' : 'text-red-500'}`} title="Difference from IMDb Rating">
+                                {isPos ? '+' : ''}{delta.toFixed(1)}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                       
