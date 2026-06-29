@@ -86,10 +86,21 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
 
   // Build the dynamic aspects list based on the current preset's weights
   const currentAspects = Object.keys(weights).map(id => {
+    // 1. Prioritize explicitly set custom metadata (if it exists)
+    if (activePreset && activePreset.aspectMeta && activePreset.aspectMeta[id]) {
+      return { 
+        id, 
+        label: activePreset.aspectMeta[id].label, 
+        desc: activePreset.aspectMeta[id].desc || 'Custom Aspect'
+      }
+    }
+    
+    // 2. Fallback to default IMDb aspects if it matches an internal ID
     if (DEFAULT_ASPECTS_META[id]) {
       return { id, ...DEFAULT_ASPECTS_META[id] }
     }
-    // For custom aspects, capitalize the ID for the label
+    
+    // 3. Ultimate fallback for legacy custom aspects that have no metadata
     return { 
       id, 
       label: id.charAt(0).toUpperCase() + id.slice(1), 
@@ -120,12 +131,13 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
   const calculateOverall = () => {
     let totalScore = 0
     let totalWeight = 0
-    for (const aspect in scores) {
-      const weight = weights[aspect] || 1
-      totalScore += scores[aspect] * weight
+    for (const aspect in weights) {
+      const score = scores[aspect] !== undefined ? scores[aspect] : 5
+      const weight = weights[aspect]
+      totalScore += score * weight
       totalWeight += weight
     }
-    const avg = totalScore / totalWeight
+    const avg = totalWeight > 0 ? (totalScore / totalWeight) : 0
     return avg.toFixed(1)
   }
 

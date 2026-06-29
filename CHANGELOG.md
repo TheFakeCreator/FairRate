@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Users can now edit custom aspect names and optionally provide descriptions in the Options dashboard.
+- Custom aspects now perfectly preserve the exact case formatting typed by the user, rather than overriding them with default labels.
+- Users can now delete movie ratings from the Rating History dashboard, which automatically syncs the deletion to the cloud.
+
+### Fixed
+- Fixed an issue where the weighted average score calculation in the modal was silently including hidden default aspects.
+
 ## [1.3.1] - 2026-06-23
 
 ### Fixed

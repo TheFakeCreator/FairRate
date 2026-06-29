@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle } from 'lucide-react'
-import { getAllRatings, getPresets, savePresets, pullFromCloud, pushToCloud, searchUser, toggleFollow, getFollowing } from '../lib/storage'
+import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X } from 'lucide-react'
+import { getAllRatings, getPresets, savePresets, pullFromCloud, pushToCloud, searchUser, toggleFollow, getFollowing, deleteRating } from '../lib/storage'
 import { signInWithGoogle, signOut, getUser } from '../lib/auth'
 import '../content/styles.css'
 
@@ -18,6 +18,7 @@ function OptionsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [latestVersion, setLatestVersion] = useState('')
+  const [editingAspect, setEditingAspect] = useState(null)
 
   useEffect(() => {
     // Check for updates
@@ -102,8 +103,15 @@ function OptionsPage() {
     setLoading(false)
   }
 
-  const handleSavePreset = async (presetId, newWeights) => {
-    const updated = presets.map(p => p.id === presetId ? { ...p, weights: newWeights } : p)
+  const handleSavePreset = async (presetId, newWeights, newMeta = null) => {
+    const updated = presets.map(p => {
+      if (p.id === presetId) {
+        const payload = { ...p, weights: newWeights }
+        if (newMeta !== null) payload.aspectMeta = newMeta
+        return payload
+      }
+      return p
+    })
     setPresets(updated)
     await savePresets(updated)
   }
@@ -136,14 +144,16 @@ function OptionsPage() {
   }
 
   const handleAddAspect = async (presetId, aspectName) => {
-    if (!aspectName.trim()) return;
-    const cleanName = aspectName.trim().toLowerCase();
+    const cleanName = aspectName.trim();
+    if (!cleanName) return;
     const preset = presets.find(p => p.id === presetId);
     if (!preset) return;
     
-    // Default weight is 1
-    const newWeights = { ...preset.weights, [cleanName]: 1 };
-    await handleSavePreset(presetId, newWeights);
+    const newId = `aspect_${Date.now()}`;
+    const newWeights = { ...preset.weights, [newId]: 1 };
+    const newMeta = { ...(preset.aspectMeta || {}), [newId]: { label: cleanName, desc: 'Custom Aspect' } };
+    
+    await handleSavePreset(presetId, newWeights, newMeta);
   }
 
   const handleRemoveAspect = async (presetId, aspectName) => {
@@ -157,7 +167,22 @@ function OptionsPage() {
       alert("A preset must have at least one aspect.");
       return;
     }
-    await handleSavePreset(presetId, newWeights);
+    
+    const newMeta = { ...(preset.aspectMeta || {}) };
+    delete newMeta[aspectName];
+    
+    await handleSavePreset(presetId, newWeights, newMeta);
+  }
+
+  const handleDeleteRating = async (movieId) => {
+    if (confirm("Are you sure you want to delete this rating? This will remove it from the cloud as well.")) {
+      const success = await deleteRating(movieId);
+      if (success) {
+        setRatings(ratings.filter(r => r.movieId !== movieId));
+      } else {
+        alert("Failed to delete rating.");
+      }
+    }
   }
 
   const filteredRatings = ratings.filter(r => (r.title || '').toLowerCase().includes((searchQuery || '').toLowerCase()))
@@ -305,8 +330,15 @@ function OptionsPage() {
                     </div>
                     
                     {/* Right Side Info */}
-                    <div className="flex-1 flex flex-col p-5">
-                      <div className="flex justify-between items-start mb-4 gap-2">
+                    <div className="flex-1 flex flex-col p-5 relative">
+                      <button 
+                        onClick={() => handleDeleteRating(r.movieId)}
+                        className="absolute top-2 right-2 text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-2 rounded-full hover:bg-red-500/10 z-10"
+                        title="Delete Rating"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <div className="flex justify-between items-start mb-4 gap-2 pr-6">
                         <a href={`https://www.imdb.com/title/${r.movieId}/`} target="_blank" rel="noreferrer" className="text-lg font-bold hover:text-imdb-yellow transition-colors line-clamp-2 leading-tight">
                           {r.title}
                         </a>
@@ -365,11 +397,29 @@ function OptionsPage() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                    {Object.entries(preset.weights).map(([aspect, weight]) => (
+                    {Object.entries(preset.weights).map(([aspect, weight]) => {
+                      const meta = preset.aspectMeta?.[aspect];
+                      const displayLabel = meta ? meta.label : aspect;
+                      
+                      return (
                       <div key={aspect} className="space-y-2 group">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
-                            <label className="capitalize font-medium text-gray-300">{aspect} Weight</label>
+                            <label className="capitalize font-medium text-gray-300 truncate max-w-[180px]" title={displayLabel}>{displayLabel} Weight</label>
+                            <button 
+                              onClick={() => {
+                                setEditingAspect({ 
+                                  presetId: preset.id, 
+                                  id: aspect, 
+                                  label: displayLabel, 
+                                  desc: meta?.desc || '' 
+                                })
+                              }}
+                              className="text-gray-600 hover:text-imdb-yellow opacity-0 group-hover:opacity-100 transition-all p-1 rounded hover:bg-imdb-yellow/10"
+                              title="Edit Aspect"
+                            >
+                              <Edit2 className="w-3 h-3" />
+                            </button>
                             <button 
                               onClick={() => handleRemoveAspect(preset.id, aspect)}
                               className="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-1 rounded hover:bg-red-500/10"
@@ -395,7 +445,7 @@ function OptionsPage() {
                           <span>3x (Critical)</span>
                         </div>
                       </div>
-                    ))}
+                    )})}
                   </div>
 
                   {/* Add Custom Aspect */}
@@ -524,6 +574,54 @@ function OptionsPage() {
           </div>
         ) : null}
       </div>
+
+      {/* Edit Aspect Modal */}
+      {editingAspect && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-imdb-dark border border-imdb-border rounded-xl p-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-xl">Edit Aspect</h3>
+              <button onClick={() => setEditingAspect(null)} className="text-gray-400 hover:text-white p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  value={editingAspect.label}
+                  onChange={e => setEditingAspect({...editingAspect, label: e.target.value})}
+                  className="w-full bg-imdb-darker border border-imdb-border rounded-md px-4 py-2 focus:outline-none focus:border-imdb-yellow text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Description <span className="text-gray-600">(Optional)</span></label>
+                <textarea 
+                  value={editingAspect.desc}
+                  onChange={e => setEditingAspect({...editingAspect, desc: e.target.value})}
+                  rows={2}
+                  className="w-full bg-imdb-darker border border-imdb-border rounded-md px-4 py-2 focus:outline-none focus:border-imdb-yellow text-white resize-none text-sm"
+                  placeholder="e.g. Performances and character arcs."
+                />
+              </div>
+              <button 
+                onClick={async () => {
+                  const preset = presets.find(p => p.id === editingAspect.presetId)
+                  if (!preset) return
+                  const newMeta = { ...(preset.aspectMeta || {}) }
+                  newMeta[editingAspect.id] = { label: editingAspect.label.trim() || editingAspect.id, desc: editingAspect.desc.trim() }
+                  await handleSavePreset(preset.id, preset.weights, newMeta)
+                  setEditingAspect(null)
+                }}
+                className="w-full bg-imdb-yellow text-black font-bold py-2.5 rounded-md hover:bg-[#d8ad15] transition-colors mt-2"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

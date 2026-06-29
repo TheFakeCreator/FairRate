@@ -84,6 +84,37 @@ export async function getRating(movieId) {
 }
 
 /**
+ * Delete a rating for a specific movie ID
+ */
+export async function deleteRating(movieId) {
+  if (!isExtensionContext) {
+    return new Promise(resolve => {
+      try {
+        chrome.runtime.sendMessage({ action: 'deleteRating', movieId }, (response) => {
+          if (chrome.runtime.lastError) console.warn(chrome.runtime.lastError)
+          resolve(response)
+        })
+      } catch (e) {
+        console.warn("FairRate: sendMessage error", e)
+        resolve(false)
+      }
+    })
+  }
+
+  try {
+    await ratingsStore.removeItem(movieId)
+    
+    // Auto-sync to cloud if logged in
+    pushToCloud().catch(console.error)
+    
+    return true
+  } catch (err) {
+    console.error("Failed to delete rating:", err)
+    return false
+  }
+}
+
+/**
  * Get all saved ratings
  */
 export async function getAllRatings() {
