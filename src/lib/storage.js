@@ -234,6 +234,56 @@ export const DEFAULT_PRESETS = [
     id: 'default-drama',
     name: 'Character Drama',
     weights: { story: 1.2, enjoyment: 0.8, characters: 1.5, technical: 0.8, emotional: 1.5 }
+  },
+  {
+    id: 'default-anime',
+    name: 'Anime / Animated',
+    weights: { worldbuilding: 1.5, story: 2.0, visuals: 1.5, sound: 1.1, characters: 1.5, enjoyment: 1.8, hook: 1.5, pacing: 1.5 },
+    aspectMeta: {
+      worldbuilding: { label: 'Worldbuilding', desc: '' },
+      story: { label: 'Story & Plot', desc: '' },
+      visuals: { label: 'Visuals / Animation', desc: '' },
+      sound: { label: 'Sound & Music', desc: '' },
+      characters: { label: 'Character Development', desc: '' },
+      enjoyment: { label: 'Enjoyment', desc: '' },
+      hook: { label: 'Hook', desc: '' },
+      pacing: { label: 'Pacing', desc: '' }
+    }
+  },
+  {
+    id: 'default-horror',
+    name: 'Horror / Thriller',
+    weights: { atmosphere: 2.0, pacing: 1.5, plot: 1.0, characters: 1.0, scares: 1.5 },
+    aspectMeta: {
+      atmosphere: { label: 'Atmosphere & Tension', desc: '' },
+      pacing: { label: 'Pacing', desc: '' },
+      plot: { label: 'Plot', desc: '' },
+      characters: { label: 'Characters & Acting', desc: '' },
+      scares: { label: 'Scares / Impact', desc: '' }
+    }
+  },
+  {
+    id: 'default-comedy',
+    name: 'Comedy',
+    weights: { humor: 2.5, pacing: 1.5, characters: 1.5, plot: 0.5 },
+    aspectMeta: {
+      humor: { label: 'Humor / Laughs', desc: '' },
+      pacing: { label: 'Pacing', desc: '' },
+      characters: { label: 'Characters & Chemistry', desc: '' },
+      plot: { label: 'Plot', desc: '' }
+    }
+  },
+  {
+    id: 'default-scifi',
+    name: 'Sci-Fi / Fantasy',
+    weights: { worldbuilding: 2.0, vfx: 1.5, plot: 1.5, characters: 1.0, enjoyment: 1.0 },
+    aspectMeta: {
+      worldbuilding: { label: 'Worldbuilding', desc: '' },
+      vfx: { label: 'VFX / Practical Effects', desc: '' },
+      plot: { label: 'Plot & Originality', desc: '' },
+      characters: { label: 'Characters', desc: '' },
+      enjoyment: { label: 'Enjoyment', desc: '' }
+    }
   }
 ]
 
@@ -252,8 +302,18 @@ export async function getPresets() {
     })
   }
   try {
-    const presets = await settingsStore.getItem('presets')
-    return presets || DEFAULT_PRESETS
+    let presets = await settingsStore.getItem('presets')
+    if (!presets) return DEFAULT_PRESETS;
+    
+    // Migration: Inject any missing default presets (by ID)
+    let missingDefaults = DEFAULT_PRESETS.filter(dp => !presets.find(p => p.id === dp.id));
+    if (missingDefaults.length > 0) {
+      presets = [...presets, ...missingDefaults];
+      await settingsStore.setItem('presets', presets);
+      pushToCloud().catch(e => console.warn("Failed auto-sync defaults", e));
+    }
+    
+    return presets
   } catch (err) {
     console.error("Failed to get presets:", err)
     return DEFAULT_PRESETS

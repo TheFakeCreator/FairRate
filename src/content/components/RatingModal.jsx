@@ -230,7 +230,7 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
   const renderCard = (isExport = false) => {
     if (shareLayout === 'horizontal') {
       return (
-        <div ref={isExport ? cardRef : null} className="w-[850px] h-[544px] bg-[#0a0a0a] flex p-8 gap-8 rounded-xl border border-[#333] shadow-2xl relative overflow-hidden shrink-0">
+        <div ref={isExport ? cardRef : null} className="w-[850px] min-h-[544px] h-auto bg-[#0a0a0a] flex p-8 gap-8 rounded-xl border border-[#333] shadow-2xl relative overflow-hidden shrink-0">
           {posterUrl && (
             <>
               <img src={posterUrl} crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-30 scale-[1.2] saturate-[2] z-0 pointer-events-none" />
@@ -251,7 +251,7 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
                 <span className="text-2xl font-bold text-gray-400 mb-1">/10</span>
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-3 shrink-0">
+            <div className={cn("grid gap-y-3 shrink-0", currentAspects.length > 5 ? "grid-cols-2 gap-x-12" : "grid-cols-1")}>
               {currentAspects.map(aspect => (
                 <div key={aspect.id} className="flex items-center justify-between text-lg">
                   <span className="text-gray-400 capitalize">{aspect.label}</span>
@@ -270,7 +270,7 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
       );
     } else {
       return (
-        <div ref={isExport ? cardRef : null} className="w-[500px] h-[1150px] bg-[#0a0a0a] p-10 flex flex-col items-center rounded-xl border border-[#333] shadow-2xl relative overflow-hidden shrink-0">
+        <div ref={isExport ? cardRef : null} className="w-[500px] min-h-[1150px] h-auto bg-[#0a0a0a] p-10 flex flex-col items-center rounded-xl border border-[#333] shadow-2xl relative overflow-hidden shrink-0">
           {posterUrl && (
             <>
               <img src={posterUrl} crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-30 scale-[1.2] saturate-[2] z-0 pointer-events-none" />
@@ -290,9 +290,9 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
               <span className="text-xl font-bold text-gray-400 mb-1">/10</span>
             </div>
           </div>
-          <div className="w-full space-y-4 mb-8 z-10 shrink-0 mt-auto relative">
+          <div className={cn("w-full mb-8 z-10 shrink-0 mt-auto relative", currentAspects.length > 6 ? "space-y-2.5" : "space-y-4")}>
             {currentAspects.map(aspect => (
-              <div key={aspect.id} className="flex items-center justify-between text-lg bg-black/60 backdrop-blur-md px-5 py-2.5 rounded-lg border border-white/5">
+              <div key={aspect.id} className={cn("flex items-center justify-between text-lg bg-black/60 backdrop-blur-md px-5 rounded-lg border border-white/5", currentAspects.length > 6 ? "py-1.5" : "py-2.5")}>
                 <span className="text-gray-400 capitalize">{aspect.label}</span>
                 <span className="text-white font-mono font-bold flex items-center gap-2">
                   {scores[aspect.id] || 5} <Star className="w-4 h-4 fill-imdb-yellow text-imdb-yellow" />

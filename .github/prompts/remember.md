@@ -1,0 +1,3 @@
+Remember that
+- We are working in a production ready chrome extension so whenever we define a new feature we have to update the extension code, manifest.json, changelog.md, and docs etc. to ensure that the extension is production ready. Also to migrate the user to the new version we have to be backward compatible so we have to update the extension code in such a way that the user can migrate to the new version without any data loss.
+- To update the website of the new changes during a release push.
