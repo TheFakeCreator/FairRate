@@ -592,7 +592,7 @@ function OptionsPage() {
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
-                      <div className="flex justify-between items-start mb-4 gap-2 pr-6">
+                      <div className="flex justify-between items-start mb-4 gap-2">
                         <a href={`https://www.imdb.com/title/${r.movieId}/`} target="_blank" rel="noreferrer" className="text-lg font-bold hover:text-imdb-yellow transition-colors line-clamp-2 leading-tight">
                           {r.title}
                         </a>
