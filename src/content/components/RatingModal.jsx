@@ -185,8 +185,34 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
     }
   }
 
+  const getPublicIMDbRating = () => {
+    try {
+      if (window.location.pathname.includes(movieId)) {
+        const heroRating = document.querySelector('[data-testid="hero-rating-bar__aggregate-rating__score"] > span:first-child');
+        if (heroRating && !isNaN(Number(heroRating.innerText))) {
+          return Number(heroRating.innerText);
+        }
+      }
+      const listWrapper = document.getElementById(`fairrate-list-${movieId}`);
+      if (listWrapper) {
+        const listItem = listWrapper.closest('.ipc-metadata-list-summary-item');
+        if (listItem) {
+          const listRating = listItem.querySelector('.ipc-rating-star--rating');
+          if (listRating && !isNaN(Number(listRating.innerText))) {
+            return Number(listRating.innerText);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("FairRate: Failed to parse public IMDb rating", e);
+    }
+    return null;
+  };
+
   const handleSave = async () => {
     setIsSaving(true)
+    const publicIMDbRating = getPublicIMDbRating();
+
     await saveRating(movieId, {
       title,
       posterUrl,
@@ -194,7 +220,8 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
       overall: overallScore,
       presetId: selectedPresetId,
       presetName: activePreset.name,
-      weights
+      weights,
+      publicIMDbRating
     })
     
     await syncToIMDb(Math.round(Number(overallScore)))
