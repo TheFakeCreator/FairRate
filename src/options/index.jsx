@@ -541,8 +541,8 @@ function OptionsPage() {
                   className="bg-imdb-darker border border-imdb-border text-gray-300 text-sm rounded-lg focus:ring-imdb-yellow focus:border-imdb-yellow p-2 outline-none appearance-none pr-8 cursor-pointer"
                 >
                   <option value="all">Any Bias</option>
-                  <option value="underrated">Underrated by Audience (Your Score is Higher)</option>
-                  <option value="overrated">Overrated by Audience (Your Score is Lower)</option>
+                  <option value="underrated">Underrated (You &gt; IMDb)</option>
+                  <option value="overrated">Overrated (You &lt; IMDb)</option>
                 </select>
               </div>
 
