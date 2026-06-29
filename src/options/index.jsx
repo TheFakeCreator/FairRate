@@ -323,8 +323,8 @@ function OptionsPage() {
     if (filterBias !== 'all') {
       if (!r.publicIMDbRating) return false;
       const delta = Number(r.overall) - r.publicIMDbRating;
-      if (filterBias === 'underrated' && delta < 1.0) return false; // Must be >= 1.0 higher than IMDb
-      if (filterBias === 'overrated' && delta > -1.0) return false; // Must be <= -1.0 lower than IMDb
+      if (filterBias === 'underrated' && delta < 0.1) return false; // Must be higher than IMDb
+      if (filterBias === 'overrated' && delta > -0.1) return false; // Must be lower than IMDb
     }
     
     return true;
