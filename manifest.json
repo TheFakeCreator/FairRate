@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FairRate",
-  "version": "1.3.1",
+  "version": "1.4.1",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr2FSC01ArUGFFW4lFet/226pUTNLYoi04Y7CduDeJce14RZlBfooG+Dr0jU20rHPz35qRK1/W/py3wZMUlf4R4AF1I5YW8JyJt4G88S1vchK4OlNxYC++/bB8whKQufU0l6SyjfJkETSddV6Q1mZyJB8WaLgFNHCeEEukZL9K2xO0cHCLgqkg5nap1Goum8/nmZ0hrPwTZ7CHKRmDoDbwQqAl46KdgSmfwSI93ErohwYcDIsDKDw+LS3f0kt2Z9vL5vJLBbWeeMmWYGSHFqoDsJ43MjxQNPXk9XxBEK8d8gI0EqEGwgn2/ZjQ/ZSyeixbdYQck5XKPZEFYo2cYk+AQIDAQAB",
   "description": "Context-Aware Movie Rating for IMDb",
   "action": {
@@ -21,10 +21,8 @@
       "js": ["src/content/index.jsx"]
     }
   ],
-  "permissions": [
-    "storage",
-    "identity"
-  ],
+  "permissions": ["storage", "identity"],
+  "host_permissions": ["*://*.imdb.com/*"],
   "oauth2": {
     "client_id": "355211286136-6ldsh3qc7pld97qg0vckj7nr3o54r1gd.apps.googleusercontent.com",
     "scopes": [
