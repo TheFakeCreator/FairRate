@@ -370,7 +370,7 @@ export default function AnalyticsTab({ ratings }) {
                     tickLine={false}
                   />
                   <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#333' }} content={<CustomTooltip />} />
-                  <Scatter data={stats.scatter} fill="#f5c518" line={false} shape="circle" />
+                  <Scatter data={stats.scatter} fill="#f5c518" line={{ stroke: '#f5c518', strokeWidth: 2, opacity: 0.5 }} shape="circle" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
