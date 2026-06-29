@@ -108,8 +108,8 @@ export default function AnalyticsTab({ ratings }) {
                 <ActivityCalendar 
                   data={stats.activity} 
                   theme={{
-                    light: ['#222222', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518'],
-                    dark: ['#222222', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518']
+                    light: ['#333333', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518'],
+                    dark: ['#333333', '#d8ad1533', '#d8ad1566', '#d8ad1599', '#f5c518']
                   }}
                   colorScheme="dark"
                   labels={{
