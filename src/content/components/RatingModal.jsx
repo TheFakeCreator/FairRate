@@ -91,7 +91,7 @@ export default function RatingModal({ movieId, title, posterUrl, onClose }) {
       return { 
         id, 
         label: activePreset.aspectMeta[id].label, 
-        desc: activePreset.aspectMeta[id].desc || 'Custom Aspect'
+        desc: activePreset.aspectMeta[id].desc !== undefined ? activePreset.aspectMeta[id].desc : 'Custom Aspect'
       }
     }
     

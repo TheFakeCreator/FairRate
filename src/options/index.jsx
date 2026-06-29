@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
-import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X } from 'lucide-react'
-import { getAllRatings, getPresets, savePresets, pullFromCloud, pushToCloud, searchUser, toggleFollow, getFollowing, deleteRating } from '../lib/storage'
+import { LayoutDashboard, Sliders, Settings, Star, Search, Plus, Trash2, Save, Film, RefreshCw, Users, AlertCircle, Edit2, X, Upload } from 'lucide-react'
+import { getAllRatings, getPresets, savePresets, pullFromCloud, pushToCloud, searchUser, toggleFollow, getFollowing, deleteRating, batchImportIMDbRatings } from '../lib/storage'
 import { signInWithGoogle, signOut, getUser } from '../lib/auth'
 import '../content/styles.css'
+
+const DEFAULT_ASPECTS_META = {
+  enjoyment: { label: 'Enjoyment & Pacing', desc: 'How much fun was it to watch?' },
+  story: { label: 'Story & Plot', desc: 'Writing, structure, and coherence.' },
+  characters: { label: 'Characters & Acting', desc: 'Performances and character arcs.' },
+  technical: { label: 'Technical Execution', desc: 'Cinematography, sound, VFX.' },
+  emotional: { label: 'Emotional Impact', desc: 'Did it make you feel something?' },
+}
 
 function OptionsPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -19,6 +27,9 @@ function OptionsPage() {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [latestVersion, setLatestVersion] = useState('')
   const [editingAspect, setEditingAspect] = useState(null)
+  
+  const fileInputRef = useRef(null)
+  const [importProgress, setImportProgress] = useState(null)
 
   useEffect(() => {
     // Check for updates
@@ -185,6 +196,95 @@ function OptionsPage() {
     }
   }
 
+  const handleImportCSV = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n');
+      if (lines.length < 2) {
+        alert("Invalid CSV file.");
+        return;
+      }
+
+      const parseCSVRow = (str) => {
+        const result = [];
+        let cur = '';
+        let inQuotes = false;
+        for (let i = 0; i < str.length; i++) {
+          const char = str[i];
+          if (char === '"' && str[i+1] === '"') {
+            cur += '"';
+            i++;
+          } else if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(cur);
+            cur = '';
+          } else {
+            cur += char;
+          }
+        }
+        result.push(cur);
+        return result;
+      };
+
+      const headers = parseCSVRow(lines[0].trim());
+      const constIdx = headers.indexOf('Const');
+      const ratingIdx = headers.indexOf('Your Rating');
+      const titleIdx = headers.indexOf('Title');
+
+      if (constIdx === -1 || ratingIdx === -1 || titleIdx === -1) {
+        alert("Could not find required columns (Const, Your Rating, Title) in CSV.");
+        return;
+      }
+
+      setImportProgress({ percent: 0, count: 0 });
+      
+      const parsedRatings = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const cols = parseCSVRow(line);
+        const movieId = cols[constIdx];
+        const ratingStr = cols[ratingIdx];
+        const title = cols[titleIdx];
+        
+        if (movieId && ratingStr) {
+          const overall = parseFloat(ratingStr);
+          if (!isNaN(overall)) {
+            parsedRatings.push({ movieId, overall, title: title || 'Unknown Title' });
+          }
+        }
+      }
+
+      if (parsedRatings.length === 0) {
+        alert("No valid ratings found in CSV.");
+        setImportProgress(null);
+        return;
+      }
+
+      const importedCount = await batchImportIMDbRatings(parsedRatings, (percent, count) => {
+        setImportProgress({ percent, count });
+      });
+
+      if (importedCount !== -1) {
+        alert(`Successfully imported ${importedCount} new ratings!`);
+        const rData = await getAllRatings();
+        setRatings(rData);
+      } else {
+        alert("An error occurred during import.");
+      }
+      
+      setImportProgress(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.readAsText(file);
+  }
+
   const filteredRatings = ratings.filter(r => (r.title || '').toLowerCase().includes((searchQuery || '').toLowerCase()))
 
   return (
@@ -298,15 +398,31 @@ function OptionsPage() {
           <div className="p-8 max-w-7xl mx-auto space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-3xl font-bold">Your Movie Ratings</h2>
-              <div className="relative w-72">
-                <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <div className="flex items-center gap-4">
                 <input 
-                  type="text" 
-                  placeholder="Search movies..." 
-                  className="w-full bg-imdb-dark border border-imdb-border rounded-full pl-10 pr-4 py-2 focus:outline-none focus:border-imdb-yellow transition-colors"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  type="file" 
+                  accept=".csv" 
+                  ref={fileInputRef} 
+                  onChange={handleImportCSV} 
+                  className="hidden" 
                 />
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 bg-imdb-darker border border-imdb-border text-gray-300 px-4 py-2 rounded-full hover:text-imdb-yellow hover:border-imdb-yellow transition-colors text-sm font-bold"
+                  title="Import from IMDb CSV"
+                >
+                  <Upload className="w-4 h-4" /> Import CSV
+                </button>
+                <div className="relative w-72">
+                  <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search movies..." 
+                    className="w-full bg-imdb-dark border border-imdb-border rounded-full pl-10 pr-4 py-2 focus:outline-none focus:border-imdb-yellow transition-colors"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
@@ -349,12 +465,26 @@ function OptionsPage() {
                       </div>
                       
                       <div className="mt-auto space-y-2 pt-4 border-t border-imdb-border">
-                        {Object.entries(r.scores).map(([aspect, score]) => (
-                          <div key={aspect} className="flex justify-between items-center text-xs">
-                            <span className="capitalize text-gray-400">{aspect}</span>
-                            <span className="font-mono font-bold text-gray-200">{score.toFixed(1)}</span>
-                          </div>
-                        ))}
+                        {(r.weights ? Object.keys(r.weights) : Object.keys(r.scores)).map(aspect => {
+                          const score = r.scores[aspect];
+                          if (score === undefined) return null;
+                          
+                          // Resolve label
+                          let displayLabel = aspect;
+                          const preset = presets.find(p => p.id === r.presetId);
+                          if (preset && preset.aspectMeta && preset.aspectMeta[aspect]) {
+                            displayLabel = preset.aspectMeta[aspect].label;
+                          } else if (DEFAULT_ASPECTS_META[aspect]) {
+                            displayLabel = DEFAULT_ASPECTS_META[aspect].label;
+                          }
+                          
+                          return (
+                            <div key={aspect} className="flex justify-between items-center text-xs">
+                              <span className="capitalize text-gray-400">{displayLabel}</span>
+                              <span className="font-mono font-bold text-gray-200">{score.toFixed(1)}</span>
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
@@ -619,6 +749,25 @@ function OptionsPage() {
                 Save Changes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Progress Overlay */}
+      {importProgress && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="bg-imdb-dark border border-imdb-border rounded-xl p-8 shadow-2xl max-w-sm w-full text-center">
+            <div className="w-16 h-16 mx-auto mb-4 border-4 border-imdb-darker border-t-imdb-yellow rounded-full animate-spin"></div>
+            <h3 className="font-bold text-xl mb-2">Importing Ratings</h3>
+            <p className="text-gray-400 text-sm mb-6">Parsing and syncing your IMDb history...</p>
+            
+            <div className="w-full bg-imdb-darker rounded-full h-3 mb-2 overflow-hidden">
+              <div 
+                className="bg-imdb-yellow h-3 rounded-full transition-all duration-300 ease-out" 
+                style={{ width: `${importProgress.percent}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-500 font-mono text-right">{importProgress.count} items processed</p>
           </div>
         </div>
       )}

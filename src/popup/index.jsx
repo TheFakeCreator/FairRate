@@ -1,11 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Download, Upload, Film, Star } from 'lucide-react'
-import { getAllRatings, exportRatings, importRatings } from '../lib/storage'
+import { getAllRatings, exportRatings, importRatings, getPresets } from '../lib/storage'
 import '../content/styles.css'
+
+const DEFAULT_ASPECTS_META = {
+  enjoyment: { label: 'Enjoyment & Pacing', desc: 'How much fun was it to watch?' },
+  story: { label: 'Story & Plot', desc: 'Writing, structure, and coherence.' },
+  characters: { label: 'Characters & Acting', desc: 'Performances and character arcs.' },
+  technical: { label: 'Technical Execution', desc: 'Cinematography, sound, VFX.' },
+  emotional: { label: 'Emotional Impact', desc: 'Did it make you feel something?' },
+}
 
 function Popup() {
   const [ratings, setRatings] = useState([])
+  const [presets, setPresets] = useState([])
   const [loading, setLoading] = useState(true)
   const fileInputRef = useRef(null)
 
@@ -15,6 +24,8 @@ function Popup() {
 
   async function loadRatings() {
     setLoading(true)
+    const pData = await getPresets()
+    setPresets(pData)
     const data = await getAllRatings()
     setRatings(data)
     setLoading(false)
@@ -94,14 +105,27 @@ function Popup() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs pt-3 border-t border-white/5">
-                {Object.entries(r.scores).map(([aspect, score]) => (
-                  <div key={aspect} className="flex justify-between items-center bg-[#222] px-2 py-1.5 rounded border border-white/5">
-                    <span className="capitalize text-gray-400 font-medium">{aspect}</span>
-                    <span className="font-bold text-gray-200 flex items-center gap-1">
-                      {score} <Star className="w-3 h-3 fill-imdb-yellow text-imdb-yellow" />
-                    </span>
-                  </div>
-                ))}
+                {(r.weights ? Object.keys(r.weights) : Object.keys(r.scores)).map(aspect => {
+                  const score = r.scores[aspect];
+                  if (score === undefined) return null;
+                  
+                  let displayLabel = aspect;
+                  const preset = presets.find(p => p.id === r.presetId);
+                  if (preset && preset.aspectMeta && preset.aspectMeta[aspect]) {
+                    displayLabel = preset.aspectMeta[aspect].label;
+                  } else if (DEFAULT_ASPECTS_META[aspect]) {
+                    displayLabel = DEFAULT_ASPECTS_META[aspect].label;
+                  }
+                  
+                  return (
+                    <div key={aspect} className="flex justify-between items-center bg-[#222] px-2 py-1.5 rounded border border-white/5">
+                      <span className="capitalize text-gray-400 font-medium truncate pr-2" title={displayLabel}>{displayLabel}</span>
+                      <span className="font-bold text-gray-200 flex items-center gap-1 shrink-0">
+                        {score} <Star className="w-3 h-3 fill-imdb-yellow text-imdb-yellow" />
+                      </span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           ))

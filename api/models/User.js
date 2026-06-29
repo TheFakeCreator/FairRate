@@ -4,6 +4,7 @@ const presetSchema = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   weights: { type: Map, of: Number },
+  aspectMeta: { type: mongoose.Schema.Types.Mixed },
   isDefault: { type: Boolean, default: false }
 }, { _id: false });
 
@@ -13,6 +14,9 @@ const ratingSchema = new mongoose.Schema({
   posterUrl: { type: String },
   overall: { type: Number, required: true },
   scores: { type: Map, of: Number },
+  weights: { type: Map, of: Number },
+  presetId: { type: String },
+  presetName: { type: String },
   updatedAt: { type: Date, default: Date.now }
 }, { _id: false });
 

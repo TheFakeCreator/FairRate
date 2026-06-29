@@ -133,6 +133,58 @@ export async function getAllRatings() {
 }
 
 /**
+ * Batch import IMDb CSV ratings
+ */
+export async function batchImportIMDbRatings(csvRatings, onProgress = null) {
+  if (!isExtensionContext) return -1;
+  try {
+    const presets = await getPresets();
+    const targetPreset = presets[0] || DEFAULT_PRESETS[0];
+    const aspects = Object.keys(targetPreset.weights);
+    
+    let imported = 0;
+    
+    for (let i = 0; i < csvRatings.length; i++) {
+      const { movieId, overall, title } = csvRatings[i];
+      const existing = await ratingsStore.getItem(movieId);
+      if (existing) continue; // Skip existing
+
+      const scores = {};
+      for (const aspect of aspects) {
+        scores[aspect] = overall;
+      }
+
+      await ratingsStore.setItem(movieId, {
+        title,
+        overall,
+        scores,
+        presetId: targetPreset.id,
+        updatedAt: new Date().toISOString()
+      });
+      
+      imported++;
+      
+      if (onProgress && i % 50 === 0) {
+        onProgress(Math.floor((i / csvRatings.length) * 100), imported);
+      }
+    }
+    
+    if (onProgress) {
+      onProgress(100, imported);
+    }
+    
+    if (imported > 0) {
+      pushToCloud().catch(console.error);
+    }
+    
+    return imported;
+  } catch (err) {
+    console.error("Batch import failed:", err);
+    return -1;
+  }
+}
+
+/**
  * Clear all ratings and import new ones
  */
 export async function importRatings(jsonData) {
