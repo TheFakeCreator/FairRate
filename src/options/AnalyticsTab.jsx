@@ -136,13 +136,14 @@ export default function AnalyticsTab({ ratings }) {
                   renderBlock={(block, activity) => (
                     React.cloneElement(block, {
                       'data-tooltip-id': 'heatmap-tooltip',
-                      'data-tooltip-html': `<strong>${activity.count} ratings</strong> on ${new Date(activity.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+                      'data-tooltip-content': `${activity.count} ratings on ${new Date(activity.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+                      'title': `${activity.count} ratings on ${new Date(activity.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
                     })
                   )}
                 />
                 <ReactTooltip 
                   id="heatmap-tooltip" 
-                  style={{ backgroundColor: '#222', color: '#fff', borderRadius: '8px', zIndex: 100 }} 
+                  style={{ backgroundColor: '#222', color: '#fff', borderRadius: '8px', zIndex: 9999 }} 
                 />
               </div>
             </div>
